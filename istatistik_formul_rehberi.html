@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İstatistik Formül Rehberi</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        :root {
+            --bg: #0a0e1a;
+            --s1: #111827;
+            --s2: #1e293b;
+            --s3: #334155;
+            --tx: #e2e8f0;
+            --tm: #94a3b8;
+            --td: #64748b;
+            --a1: #3b82f6;
+            --a2: #8b5cf6;
+            --a3: #06b6d4;
+            --a4: #ec4899;
+            --g: #22c55e;
+            --r: #ef4444;
+            --y: #eab308;
+            --o: #f97316;
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--tx);
+            line-height: 1.75;
+            font-size: 15px
+        }
+
+        .wrap {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 40px 28px 80px
+        }
+
+        /* ─── COVER ─── */
+        .cover {
+            text-align: center;
+            padding: 70px 0 50px;
+            position: relative;
+            overflow: hidden
+        }
+
+        .cover::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(59, 130, 246, .12) 0%, transparent 70%)
+        }
+
+        .cover h1 {
+            font-size: 3.4em;
+            font-weight: 900;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative
+        }
+
+        .cover .sub {
+            font-size: 1.05em;
+            color: var(--tm);
+            margin: 10px 0 28px
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px
+        }
+
+        .tag {
+            background: var(--s2);
+            border: 1px solid rgba(59, 130, 246, .2);
+            padding: 5px 16px;
+            border-radius: 20px;
+            font-size: .78em;
+            color: var(--a3)
+        }
+
+        /* ─── TOC ─── */
+        .toc {
+            background: linear-gradient(135deg, var(--s1), var(--s2));
+            border: 1px solid rgba(59, 130, 246, .15);
+            border-radius: 16px;
+            padding: 28px 32px;
+            margin: 40px 0
+        }
+
+        .toc h2 {
+            font-size: 1.2em;
+            color: var(--a1);
+            margin-bottom: 16px
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px 28px
+        }
+
+        .toc a {
+            color: var(--tm);
+            text-decoration: none;
+            font-size: .88em;
+            padding: 3px 0;
+            display: block;
+            transition: .2s
+        }
+
+        .toc a:hover {
+            color: var(--a1);
+            padding-left: 6px
+        }
+
+        .toc .n {
+            color: var(--a1);
+            font-weight: 700;
+            margin-right: 6px;
+            font-variant-numeric: tabular-nums
+        }
+
+        /* ─── SECTION ─── */
+        .sec {
+            margin-bottom: 52px
+        }
+
+        .sec-head {
+            background: linear-gradient(135deg, var(--s1) 0%, var(--s2) 100%);
+            border: 1px solid rgba(99, 102, 241, .15);
+            border-radius: var(--radius);
+            padding: 18px 24px;
+            margin-bottom: 22px;
+            position: relative;
+            overflow: hidden
+        }
+
+        .sec-head::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--a1), var(--a2))
+        }
+
+        .sec-head h2 {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--a1);
+            padding-left: 8px
+        }
+
+        .sec-head h2 .ic {
+            margin-right: 10px;
+            font-size: 1.1em
+        }
+
+        h3 {
+            color: var(--a2);
+            font-size: 1.05em;
+            font-weight: 600;
+            margin: 26px 0 10px;
+            padding-left: 14px;
+            border-left: 3px solid var(--a2)
+        }
+
+        h4 {
+            color: var(--a3);
+            font-size: .92em;
+            font-weight: 600;
+            margin: 18px 0 8px
+        }
+
+        p {
+            margin-bottom: 10px
+        }
+
+        strong {
+            color: #f1f5f9
+        }
+
+        ul,
+        ol {
+            margin: 8px 0 14px 22px
+        }
+
+        li {
+            margin-bottom: 5px
+        }
+
+        /* ─── FORMULA BOX ─── */
+        .f {
+            background: linear-gradient(135deg, rgba(139, 92, 246, .08), rgba(59, 130, 246, .06));
+            border: 1px solid rgba(139, 92, 246, .2);
+            border-left: 4px solid var(--a2);
+            border-radius: 10px;
+            padding: 16px 22px;
+            margin: 14px 0;
+            overflow-x: auto
+        }
+
+        .f .lab {
+            display: block;
+            font-size: .7em;
+            font-weight: 600;
+            color: var(--a2);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px
+        }
+
+        .f .katex {
+            font-size: 1.15em
+        }
+
+        .f-inline {
+            display: inline-block;
+            background: var(--s2);
+            border: 1px solid var(--s3);
+            border-radius: 6px;
+            padding: 2px 10px;
+            margin: 2px
+        }
+
+        /* ─── TABLE ─── */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 14px 0 18px;
+            border-radius: 10px;
+            overflow: hidden
+        }
+
+        thead th {
+            background: linear-gradient(135deg, var(--a1), var(--a2));
+            color: #fff;
+            padding: 10px 16px;
+            font-weight: 600;
+            font-size: .82em;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            text-align: center
+        }
+
+        td {
+            padding: 9px 16px;
+            border-bottom: 1px solid var(--s3);
+            text-align: center;
+            font-size: .9em
+        }
+
+        tr:nth-child(even) td {
+            background: rgba(30, 41, 59, .5)
+        }
+
+        tr:hover td {
+            background: rgba(59, 130, 246, .06)
+        }
+
+        /* ─── CARDS ─── */
+        .tip {
+            background: rgba(34, 197, 94, .07);
+            border: 1px solid rgba(34, 197, 94, .25);
+            border-left: 4px solid var(--g);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin: 14px 0;
+            font-size: .9em
+        }
+
+        .warn {
+            background: rgba(245, 158, 11, .07);
+            border: 1px solid rgba(245, 158, 11, .25);
+            border-left: 4px solid var(--o);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin: 14px 0;
+            font-size: .9em
+        }
+
+        .vs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin: 14px 0
+        }
+
+        .vs-c {
+            background: var(--s1);
+            border: 1px solid rgba(99, 102, 241, .15);
+            border-radius: 10px;
+            padding: 18px
+        }
+
+        .vs-c h4 {
+            margin-top: 0;
+            padding: 0;
+            border: 0;
+            color: var(--a3);
+            font-size: .95em
+        }
+
+        /* ─── TREE ─── */
+        .tree {
+            background: var(--s1);
+            border: 1px solid var(--s3);
+            border-radius: var(--radius);
+            padding: 22px 24px;
+            margin: 14px 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .8em;
+            line-height: 1.9;
+            white-space: pre;
+            overflow-x: auto;
+            color: var(--tm)
+        }
+
+        /* ─── DIVIDER ─── */
+        hr {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--s3), transparent);
+            margin: 36px 0
+        }
+
+        /* ─── PRINT ─── */
+        @media print {
+            body {
+                background: #fff;
+                color: #1e293b;
+                font-size: 11px
+            }
+
+            .wrap {
+                max-width: 100%;
+                padding: 0
+            }
+
+            .cover h1 {
+                -webkit-text-fill-color: #1e40af;
+                background: none
+            }
+
+            .sec-head {
+                background: #f1f5f9;
+                border-color: #cbd5e1
+            }
+
+            .sec-head::after {
+                background: #2563eb
+            }
+
+            .sec-head h2 {
+                color: #1e40af
+            }
+
+            h3 {
+                color: #6d28d9;
+                border-color: #6d28d9
+            }
+
+            .f {
+                background: #f5f3ff;
+                border-color: #c4b5fd
+            }
+
+            table thead th {
+                background: #2563eb
+            }
+
+            td {
+                border-color: #e2e8f0
+            }
+
+            tr:nth-child(even) td {
+                background: #f8fafc
+            }
+
+            .tip {
+                background: #f0fdf4;
+                border-color: #86efac
+            }
+
+            .warn {
+                background: #fffbeb;
+                border-color: #fcd34d
+            }
+
+            .sec {
+                page-break-inside: avoid
+            }
+
+            .tag {
+                border-color: #cbd5e1;
+                color: #0891b2
+            }
+
+            .toc {
+                background: #f8fafc;
+                border-color: #cbd5e1
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+
+        <!-- ═══ COVER ═══ -->
+        <div class="cover">
+            <h1>İSTATİSTİK FORMÜL REHBERİ</h1>
+            <p class="sub">3-4 saatte tüm istatistiği tekrar etmek için • Sadece teori & formüller</p>
+            <div class="tags">
+                <span class="tag">Shapiro-Wilk</span><span class="tag">Levene</span>
+                <span class="tag">T-Test</span><span class="tag">Z-Score</span>
+                <span class="tag">ANOVA</span><span class="tag">Ki-Kare</span>
+                <span class="tag">A/B Test</span><span class="tag">Regresyon</span>
+                <span class="tag">Bayesian</span><span class="tag">Güç Analizi</span>
+            </div>
+        </div>
+
+        <!-- ═══ TOC ═══ -->
+        <div class="toc">
+            <h2>📑 İçindekiler</h2>
+            <div class="toc-grid">
+                <a href="#s1"><span class="n">01</span>Temel Kavramlar</a>
+                <a href="#s10"><span class="n">10</span>ANOVA</a>
+                <a href="#s2"><span class="n">02</span>Olasılık Dağılımları</a>
+                <a href="#s11"><span class="n">11</span>Ki-Kare Testi</a>
+                <a href="#s3"><span class="n">03</span>Z-Skoru</a>
+                <a href="#s12"><span class="n">12</span>Korelasyon & Regresyon</a>
+                <a href="#s4"><span class="n">04</span>Güven Aralıkları</a>
+                <a href="#s13"><span class="n">13</span>Non-Parametrik Testler</a>
+                <a href="#s5"><span class="n">05</span>Hipotez Testi</a>
+                <a href="#s14"><span class="n">14</span>Etki Büyüklüğü</a>
+                <a href="#s6"><span class="n">06</span>Normallik Testleri</a>
+                <a href="#s15"><span class="n">15</span>Güç Analizi</a>
+                <a href="#s7"><span class="n">07</span>Levene Testi</a>
+                <a href="#s16"><span class="n">16</span>A/B Testi</a>
+                <a href="#s8"><span class="n">08</span>T-Testi</a>
+                <a href="#s17"><span class="n">17</span>Bayesian Temeller</a>
+                <a href="#s9"><span class="n">09</span>Z-Testi</a>
+                <a href="#s18"><span class="n">18</span>Karar Ağacı</a>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- 1. TEMEL KAVRAMLAR -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="sec" id="s1">
+            <div class="sec-head">
+                <h2><span class="ic">📐</span>1. Temel Kavramlar</h2>
+            </div>
+
+            <h3>Merkezi Eğilim Ölçüleri</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ölçü</th>
+                        <th>Formül</th>
+                        <th>Ne Zaman?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Ortalama</strong></td>
+                        <td>$\bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i$</td>
+                        <td>Simetrik dağılımlarda</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Medyan</strong></td>
+                        <td>Sıralı verinin ortası</td>
+                        <td>Çarpık dağılım / aykırı değer</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mod</strong></td>
+                        <td>En sık tekrar eden</td>
+                        <td>Kategorik veriler</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Yayılım Ölçüleri</h3>
+            <div class="f">
+                <span class="lab">Örneklem Varyansı</span>
+                $$s^2 = \frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^2$$
+            </div>
+            <div class="f">
+                <span class="lab">Standart Sapma</span>
+                $$s = \sqrt{s^2} = \sqrt{\frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^2}$$
+            </div>
+            <div class="tip">💡 <strong>n-1 (Bessel düzeltmesi):</strong> Örneklem ortalaması veriden hesaplandığı için
+                1 serbestlik derecesi kaybedilir.</div>
+
+            <h3>Şekil Ölçüleri</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ölçü</th>
+                        <th>=0</th>
+                        <th>&gt;0</th>
+                        <th>&lt;0</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Çarpıklık (Skewness)</strong></td>
+                        <td>Simetrik</td>
+                        <td>Sağa çarpık</td>
+                        <td>Sola çarpık</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Basıklık (Kurtosis)</strong></td>
+                        <td>Normal (meso)</td>
+                        <td>Sivri (lepto)</td>
+                        <td>Basık (platy)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- 2. OLASILIK DAĞILIMLARI -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="sec" id="s2">
+            <div class="sec-head">
+                <h2><span class="ic">🔔</span>2. Olasılık Dağılımları</h2>
+            </div>
+
+            <h3>Normal Dağılım (Gaussian)</h3>
+            <div class="f">
+                <span class="lab">Olasılık Yoğunluk Fonksiyonu</span>
+                $$f(x) = \frac{1}{\sigma\sqrt{2\pi}} \, e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}$$
+            </div>
+            <p><strong>68-95-99.7 Kuralı:</strong></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aralık</th>
+                        <th>Kapsam</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>$\mu \pm 1\sigma$</td>
+                        <td>%68</td>
+                    </tr>
+                    <tr>
+                        <td>$\mu \pm 2\sigma$</td>
+                        <td>%95</td>
+                    </tr>
+                    <tr>
+                        <td>$\mu \pm 3\sigma$</td>
+                        <td>%99.7</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="tip">💡 <strong>Merkezi Limit Teoremi:</strong> $n \geq 30$ olduğunda, örneklem ortalamaları
+                $\bar{X} \sim N\!\left(\mu, \frac{\sigma^2}{n}\right)$ dağılır.</div>
+
+            <h3>Binomial Dağılım</h3>
+            <p>$n$ bağımsız deneme, her birinde başarı olasılığı $p$</p>
+            <div class="f">
+                <span class="lab">PMF</span>
+                $$P(X = k) = \binom{n}{k} p^k (1-p)^{n-k}$$
+            </div>
+            <p>$E[X] = np$ &nbsp;&nbsp; $Var(X) = np(1-p)$</p>
+
+            <h3>Poisson Dağılım</h3>
+            <p>Birim zamanda/alanda nadir olay sayma ($\lambda$ = birim başına ort. olay sayısı)</p>
+            <div class="f">
+                <span class="lab">PMF</span>
+                $$P(X = k) = \frac{\lambda^k e^{-\lambda}}{k!}$$
+            </div>
+            <p>$E[X] = \lambda$ &nbsp;&nbsp; $Var(X) = \lambda$</p>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- 3. Z-SKORU -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="sec" id="s3">
+            <div class="sec-head">
+                <h2><span class="ic">📊</span>3. Z-Skoru</h2>
+            </div>
+
+            <p>Bir değerin ortalamadan kaç standart sapma uzakta olduğunu gösterir. Farklı ölçekleri karşılaştırılabilir
+                yapar.</p>
+            <div class="f">
+                <span class="lab">Tek Değer</span>
+                $$z = \frac{x - \mu}{\sigma}$$
+            </div>
+            <div class="f">
+                <span class="lab">Örneklem Ortalaması</span>
+                $$z = \frac{\bar{x} - \mu_0}{\sigma / \sqrt{n}}$$
+            </div>
+
+            <h3>Kritik Z Değerleri</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>$z$</th>
+                        <th>Tek Taraflı $P$</th>
+                        <th>Çift Taraflı $P$</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>$1.645$</td>
+                        <td>$0.050$</td>
+                        <td>$0.100$</td>
+                    </tr>
+                    <tr>
+                        <td>$1.960$</td>
+                        <td>$0.025$</td>
+                        <td>$0.050$</td>
+                    </tr>
+                    <tr>
+                        <td>$2.576$</td>
+                        <td>$0.005$</td>
+                        <td>$0.010$</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Z'den olasılık:</strong> $P(Z < z)=\Phi(z)$ &nbsp;|&nbsp; <strong>Olasılıktan Z:</strong> $z =
+                    \Phi^{-1}(p)$</p>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- 4. GÜVEN ARALIKLARI -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="sec" id="s4">
+            <div class="sec-head">
+                <h2><span class="ic">🎯</span>4. Güven Aralıkları</h2>
+            </div>
+
+            <div class="f">
+                <span class="lab">σ biliniyor veya n ≥ 30</span>
+                $$\text{GA} = \bar{x} \pm z^* \cdot \frac{\sigma}{\sqrt{n}}$$
+            </div>
+            <div class="f">
+                <span class="lab">σ bilinmiyor ve n &lt; 30</span>
+                $$\text{GA} = \bar{x} \pm t^* \cdot \frac{s}{\sqrt{n}}$$
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Güven Düzeyi</th>
+                        <th>$z^*$</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>%90</td>
+                        <td>1.645</td>
+                    </tr>
+                    <tr>
+                        <td>%95</td>
+                        <td>1.960</td>
+                    </tr>
+                    <tr>
+                        <td>%99</td>
+                        <td>2.576</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="f">
+                <span class="lab">Oran için Güven Aralığı</span>
+                $$\hat{p} \pm z^* \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}$$
+            </div>
+
+            <div class="tip">💡 <strong>Yorum:</strong> "%95 güven aralığı" = bu yöntemi sonsuz kez uygulasak, oluşan
+                aralıkların %95'i gerçek parametreyi içerir.</div>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- 5. HİPOTEZ TESTİ -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="sec" id="s5">
+            <div class="sec-head">
+                <h2><span class="ic">⚖️</span>5. Hipotez Testi Temelleri</h2>
+            </div>
+
+            <h3>Adımlar</h3>
+            <ol>
+                <li><strong>$H_0$</strong> (Sıfır hipotez): Fark yok / etki yok</li>
+                <li><strong>$H_1$</strong> (Alternatif): Fark var / etki var</li>
+                <li>Anlamlılık düzeyi belirle: $\alpha = 0.05$</li>
+                <li>Test istatistiği hesapla ($z$, $t$, $\chi^2$, $F$ ...)</li>
+                <li>p-value bul</li>
+                <li><strong>Karar:</strong> $p < \alpha \Rightarrow H_0$ red &nbsp;|&nbsp; $p \geq \alpha \Rightarrow
+                        H_0$ reddedilemez</li>
+            </ol>
+
+            <h3>Hata Tipleri</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>$H_0$ Doğru</th>
+                        <th>$H_0$ Yanlış</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>$H_0$ Reddet</strong></td>
+                        <td>❌ Tip I Hata ($\alpha$)</td>
+                        <td>✅ Doğru Karar (Güç $= 1-\beta$)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>$H_0$ Reddetme</strong></td>
+                        <td>✅ Doğru Karar</td>
+                        <td>❌ Tip II Hata ($\beta$)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Test Yönleri</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Yön</th>
+                        <th>$H_1$</th>
+                        <th>Ne Zaman?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Çift taraflı</td>
+                        <td>$\mu \neq \mu_0$</td>
+                        <td>Farkın yönü önemsiz</td>
+                    </tr>
+                    <tr>
+                        <td>Sağ taraflı</td>
+                        <td>$\mu > \mu_0$</td>
+                        <td>Artış bekleniyor</td>
+                    </tr>
+                    <tr>
+                        <td>Sol taraflı</td>
+                        <td>$\mu < \mu_0$</td>
+                        <td>Azalış bekleniyor</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- 6. NORMALLİK TESTLERİ -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="sec" id="s6">
+            <div class="sec-head">
+                <h2><span class="ic">📈</span>6. Normallik Testleri</h2>
+            </div>
+
+            <h3>Shapiro-Wilk Testi</h3>
+            <p>En güvenilir normallik testi ($n < 5000$)</p>
+                    <div class="f">
+                        <span class="lab">Test İstatistiği</span>
+                        $$W = \frac{\left(\sum_{i=1}^{n} a_i x_{(i)}\right)^2}{\sum_{i=1}^{n}(x_i - \bar{x})^2}$$
+                    </div>
+                    <ul>
+                        <li>$H_0$: Veri normal dağılımdan geliyor</li>
+                        <li>$H_1$: Normal dağılımdan gelmiyor</li>
+                        <li>$p > 0.05 \Rightarrow$ Normal kabul et ✅</li>
+                    </ul>
+
+                    <h3>D'Agostino K² Testi</h3>
+                    <p>Çarpıklık ve basıklığı birlikte test eder. Büyük örneklemlerde daha uygun.</p>
+
+                    <h3>QQ-Plot (Görsel)</h3>
+                    <p>Verinin kuantilleri ile normal dağılım kuantillerini karşılaştırır. Noktalar doğru üzerindeyse →
+                        normal.</p>
+
+                    <div class="tip">💡 <strong>Pratik:</strong> $n > 30$ ise CLT gereği parametrik testler çoğunlukla
+                        kullanılabilir (hafif normallik ihlali tolere edilir).</div>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- 7. LEVENE -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="sec" id="s7">
+            <div class="sec-head">
+                <h2><span class="ic">⚖️</span>7. Varyans Homojenliği — Levene Testi</h2>
+            </div>
+
+            <p>Grupların varyanslarının eşit olup olmadığını test eder. <strong>T-testi ve ANOVA'nın ön
+                    koşuludur.</strong></p>
+
+            <div class="f">
+                <span class="lab">Levene İstatistiği</span>
+                $$W = \frac{(N-k)}{(k-1)} \cdot \frac{\sum_{i=1}^{k} n_i (\bar{Z}_{i\cdot} -
+                \bar{Z}_{\cdot\cdot})^2}{\sum_{i=1}^{k}\sum_{j=1}^{n_i}(Z_{ij} - \bar{Z}_{i\cdot})^2}$$
+                <p style="margin:8px 0 0;font-size:.85em;color:var(--tm)">$Z_{ij} = |x_{ij} - \tilde{x}_i|$ &nbsp;
+                    (medyandan mutlak sapma)</p>
+            </div>
+
+            <ul>
+                <li>$H_0$: $\sigma_1^2 = \sigma_2^2 = \cdots = \sigma_k^2$</li>
+                <li>$p > 0.05 \Rightarrow$ Varyanslar homojen ✅</li>
+            </ul>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Test</th>
+                        <th>Avantaj</th>
+                        <th>Dezavantaj</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Levene</strong></td>
+                        <td>Normallik varsaymaz, robust</td>
+                        <td>Biraz daha az güçlü</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bartlett</strong></td>
+                        <td>Normal dağılımda daha güçlü</td>
+                        <td>Normallik ihlallerine hassas</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warn">⚠️ <strong>Homojen değilse:</strong> T-testi için Welch düzeltmesi
+                (<code>equal_var=False</code>), ANOVA yerine Welch ANOVA veya Kruskal-Wallis kullanın.</div>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- 8. T-TESTİ -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="sec" id="s8">
+            <div class="sec-head">
+                <h2><span class="ic">🔬</span>8. T-Testi</h2>
+            </div>
+
+            <h3>8.1 Tek Örneklem T-Testi</h3>
+            <p>Bir grubun ortalamasını bilinen bir değerle karşılaştırır.</p>
+            <div class="f">
+                <span class="lab">Formül</span>
+                $$t = \frac{\bar{x} - \mu_0}{s / \sqrt{n}} \qquad df = n - 1$$
+            </div>
+
+            <h3>8.2 Bağımsız İki Örneklem T-Testi</h3>
+            <p><strong>Ön koşullar:</strong> ① Normallik &nbsp; ② Varyans homojenliği &nbsp; ③ Bağımsızlık</p>
+            <div class="f">
+                <span class="lab">Eşit varyans</span>
+                $$t = \frac{\bar{x}_1 - \bar{x}_2}{s_p\sqrt{\frac{1}{n_1}+\frac{1}{n_2}}} \qquad s_p =
+                \sqrt{\frac{(n_1-1)s_1^2 + (n_2-1)s_2^2}{n_1+n_2-2}}$$
+            </div>
+            <div class="f">
+                <span class="lab">Welch T-Testi (eşit olmayan varyans)</span>
+                $$t = \frac{\bar{x}_1 - \bar{x}_2}{\sqrt{\frac{s_1^2}{n_1}+\frac{s_2^2}{n_2}}}$$
+            </div>
+
+            <h3>8.3 Eşleştirilmiş (Paired) T-Testi</h3>
+            <p>Aynı grubun öncesi-sonrası karşılaştırması. Farkları $d_i = x_{1i} - x_{2i}$ olarak hesaplanır.</p>
+            <div class="f">
+                <span class="lab">Formül</span>
+                $$t = \frac{\bar{d}}{s_d / \sqrt{n}} \qquad df = n - 1$$
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- 9. Z-TESTİ -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="sec" id="s9">
+            <div class="sec-head">
+                <h2><span class="ic">📏</span>9. Z-Testi</h2>
+            </div>
+
+            <p>T-testinin <strong>büyük örneklem ($n \geq 30$)</strong> ve <strong>$\sigma$ bilinen</strong> versiyonu.
+            </p>
+
+            <div class="f">
+                <span class="lab">Tek Örneklem</span>
+                $$z = \frac{\bar{x} - \mu_0}{\sigma / \sqrt{n}}$$
+            </div>
+            <div class="f">
+                <span class="lab">İki Oran Karşılaştırma</span>
+                $$z = \frac{\hat{p}_1 - \hat{p}_2}{\sqrt{\hat{p}(1-\hat{p})\left(\frac{1}{n_1}+\frac{1}{n_2}\right)}}
+                \qquad \hat{p} = \frac{x_1 + x_2}{n_1 + n_2}$$
+            </div>
+
+            <h3>T-Testi vs Z-Testi</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Özellik</th>
+                        <th>Z-Testi</th>
+                        <th>T-Testi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>$\sigma$ biliniyor mu?</td>
+                        <td>Evet</td>
+                        <td>Hayır</td>
+                    </tr>
+                    <tr>
+                        <td>Örneklem</td>
+                        <td>$n \geq 30$</td>
+                        <td>Herhangi</td>
+                    </tr>
+                    <tr>
+                        <td>Dağılım</td>
+                        <td>$N(0,1)$</td>
+                        <td>$t(df)$ — kalın kuyruklar</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- 10. ANOVA -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="sec" id="s10">
+            <div class="sec-head">
+                <h2><span class="ic">📊</span>10. ANOVA</h2>
+            </div>
+
+            <h3>Tek Yönlü ANOVA</h3>
+            <p>$k$ bağımsız grubun ortalamasını karşılaştırır.</p>
+            <ul>
+                <li>$H_0: \mu_1 = \mu_2 = \cdots = \mu_k$</li>
+                <li>$H_1:$ En az bir ortalama farklı</li>
+            </ul>
+
+            <div class="f">
+                <span class="lab">F İstatistiği</span>
+                $$F = \frac{MSB}{MSW} = \frac{SS_B / (k-1)}{SS_W / (N-k)}$$
+            </div>
+            <div class="f">
+                <span class="lab">Kareler Toplamı</span>
+                $$SS_B = \sum_{i=1}^{k} n_i(\bar{x}_i - \bar{x})^2 \qquad SS_W = \sum_{i=1}^{k}\sum_{j=1}^{n_i}(x_{ij} -
+                \bar{x}_i)^2$$
+            </div>
+
+            <h3>Post-hoc Testler</h3>
+            <p>ANOVA anlamlı çıktıysa ($p < 0.05$), <strong>hangi gruplar</strong> farklı?</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Test</th>
+                        <th>Kullanım</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Tukey HSD</strong></td>
+                        <td>Tüm ikili karşılaştırmalar, eşit örneklem</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bonferroni</strong></td>
+                        <td>Muhafazakâr, az sayıda karşılaştırma</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Scheffé</strong></td>
+                        <td>Esnek, eşit olmayan örneklem</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- 11. Kİ-KARE -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="sec" id="s11">
+            <div class="sec-head">
+                <h2><span class="ic">🎲</span>11. Ki-Kare Testi</h2>
+            </div>
+
+            <h3>Bağımsızlık Testi</h3>
+            <p>İki kategorik değişken arasında ilişki var mı?</p>
+            <div class="f">
+                <span class="lab">Test İstatistiği</span>
+                $$\chi^2 = \sum \frac{(O_{ij} - E_{ij})^2}{E_{ij}} \qquad E_{ij} = \frac{R_i \cdot C_j}{N}$$
+            </div>
+            <p>$df = (r-1)(c-1)$ &nbsp; ($r$ = satır, $c$ = sütun)</p>
+
+            <h3>Uyum İyiliği (Goodness of Fit)</h3>
+            <p>Gözlenen dağılım beklenen dağılıma uyuyor mu?</p>
+            <div class="f">
+                <span class="lab">Test İstatistiği</span>
+                $$\chi^2 = \sum_{i=1}^{k} \frac{(O_i - E_i)^2}{E_i} \qquad df = k - 1$$
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- 12. KORELASYON & REGRESYON -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="sec" id="s12">
+            <div class="sec-head">
+                <h2><span class="ic">📉</span>12. Korelasyon & Regresyon</h2>
+            </div>
+
+            <h3>Pearson Korelasyon Katsayısı</h3>
+            <div class="f">
+                <span class="lab">Formül</span>
+                $$r = \frac{\sum(x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum(x_i-\bar{x})^2 \cdot \sum(y_i-\bar{y})^2}}$$
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>$|r|$</th>
+                        <th>Yorum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0.00 – 0.29</td>
+                        <td>Zayıf</td>
+                    </tr>
+                    <tr>
+                        <td>0.30 – 0.69</td>
+                        <td>Orta</td>
+                    </tr>
+                    <tr>
+                        <td>0.70 – 1.00</td>
+                        <td>Güçlü</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Basit Doğrusal Regresyon</h3>
+            <div class="f">
+                <span class="lab">Model</span>
+                $$\hat{y} = \beta_0 + \beta_1 x$$
+            </div>
+            <div class="f">
+                <span class="lab">Katsayılar (OLS)</span>
+                $$\beta_1 = \frac{\sum(x_i-\bar{x})(y_i-\bar{y})}{\sum(x_i-\bar{x})^2} \qquad \beta_0 = \bar{y} -
+                \beta_1\bar{x}$$
+            </div>
+            <div class="f">
+                <span class="lab">Belirleme Katsayısı</span>
+                $$R^2 = 1 - \frac{SS_{res}}{SS_{tot}} = 1 - \frac{\sum(y_i - \hat{y}_i)^2}{\sum(y_i - \bar{y})^2}$$
+            </div>
+
+            <h3>Spearman Sıra Korelasyonu</h3>
+            <p>Non-parametrik alternatif. Monoton (doğrusal olmayan) ilişkileri de yakalar.</p>
+            <div class="f">
+                <span class="lab">Formül</span>
+                $$\rho = 1 - \frac{6\sum d_i^2}{n(n^2-1)} \qquad d_i = \text{rank}(x_i) - \text{rank}(y_i)$$
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- 13. NON-PARAMETRİK -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="sec" id="s13">
+            <div class="sec-head">
+                <h2><span class="ic">🔄</span>13. Non-Parametrik Testler</h2>
+            </div>
+
+            <p>Normallik sağlanmadığında veya sıralama (ordinal) verisi olduğunda kullanılır.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parametrik</th>
+                        <th>Non-Parametrik</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Bağımsız t-testi</td>
+                        <td><strong>Mann-Whitney U</strong></td>
+                        <td>2 bağımsız grup</td>
+                    </tr>
+                    <tr>
+                        <td>Eşleştirilmiş t</td>
+                        <td><strong>Wilcoxon İşaretli Sıra</strong></td>
+                        <td>2 bağımlı grup</td>
+                    </tr>
+                    <tr>
+                        <td>Tek yönlü ANOVA</td>
+                        <td><strong>Kruskal-Wallis</strong></td>
+                        <td>3+ bağımsız grup</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Mann-Whitney U</h3>
+            <div class="f">
+                <span class="lab">Test İstatistiği</span>
+                $$U = n_1 n_2 + \frac{n_1(n_1+1)}{2} - R_1$$
+            </div>
+
+            <h3>Kruskal-Wallis</h3>
+            <div class="f">
+                <span class="lab">H İstatistiği</span>
+                $$H = \frac{12}{N(N+1)} \sum_{i=1}^{k} \frac{R_i^2}{n_i} - 3(N+1)$$
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- 14. ETKİ BÜYÜKLÜĞÜ -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="sec" id="s14">
+            <div class="sec-head">
+                <h2><span class="ic">📐</span>14. Etki Büyüklüğü</h2>
+            </div>
+
+            <p>p-value "fark var mı?" → Etki büyüklüğü <strong>"fark ne kadar büyük?"</strong></p>
+
+            <h3>Cohen's d (T-Testi)</h3>
+            <div class="f">
+                <span class="lab">Formül</span>
+                $$d = \frac{\bar{x}_1 - \bar{x}_2}{s_p} \qquad s_p = \sqrt{\frac{(n_1-1)s_1^2 +
+                (n_2-1)s_2^2}{n_1+n_2-2}}$$
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>$|d|$</th>
+                        <th>Yorum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0.2</td>
+                        <td>Küçük etki</td>
+                    </tr>
+                    <tr>
+                        <td>0.5</td>
+                        <td>Orta etki</td>
+                    </tr>
+                    <tr>
+                        <td>0.8</td>
+                        <td>Büyük etki</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Eta-Kare (ANOVA)</h3>
+            <div class="f">
+                <span class="lab">Formül</span>
+                $$\eta^2 = \frac{SS_{between}}{SS_{total}}$$
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>$\eta^2$</th>
+                        <th>Yorum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0.01</td>
+                        <td>Küçük</td>
+                    </tr>
+                    <tr>
+                        <td>0.06</td>
+                        <td>Orta</td>
+                    </tr>
+                    <tr>
+                        <td>0.14</td>
+                        <td>Büyük</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- 15. GÜÇ ANALİZİ -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="sec" id="s15">
+            <div class="sec-head">
+                <h2><span class="ic">⚡</span>15. Güç Analizi</h2>
+            </div>
+
+            <p><strong>Testten ÖNCE</strong> yapılır. Hedeflenen etkiyi yakalamak için gerekli örneklem büyüklüğünü
+                belirler.</p>
+
+            <h3>4 Bileşen (3'ünü ver → 4.'yü hesapla)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Bileşen</th>
+                        <th>Sembol</th>
+                        <th>Tipik Değer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Etki büyüklüğü</td>
+                        <td>$d$</td>
+                        <td>0.2 / 0.5 / 0.8</td>
+                    </tr>
+                    <tr>
+                        <td>Anlamlılık</td>
+                        <td>$\alpha$</td>
+                        <td>0.05</td>
+                    </tr>
+                    <tr>
+                        <td>Güç</td>
+                        <td>$1-\beta$</td>
+                        <td>0.80</td>
+                    </tr>
+                    <tr>
+                        <td>Örneklem</td>
+                        <td>$n$</td>
+                        <td>Hesaplanır</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="f">
+                <span class="lab">Güç (Power)</span>
+                $$\text{Güç} = 1 - \beta = P(\text{Gerçek farkı yakala})$$
+            </div>
+
+            <p>Güç artar ↑ &nbsp;→&nbsp; $n$ artar, $d$ artar, $\alpha$ artar</p>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- 16. A/B TESTİ -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="sec" id="s16">
+            <div class="sec-head">
+                <h2><span class="ic">🧪</span>16. A/B Testi</h2>
+            </div>
+
+            <h3>Genel Akış</h3>
+            <ol>
+                <li>Hipotez kur: $H_0: p_A = p_B$</li>
+                <li>Başarı metriği belirle (conversion, CTR, revenue…)</li>
+                <li>MDE (Minimum Detectable Effect) ve örneklem büyüklüğü hesapla</li>
+                <li>Deneyi çalıştır ve yeterli veri topla</li>
+                <li>İstatistiksel testi uygula + sonuçları değerlendir</li>
+            </ol>
+
+            <h3>Oran Karşılaştırma Formülü</h3>
+            <div class="f">
+                <span class="lab">Z-Testi (İki Oran)</span>
+                $$z = \frac{\hat{p}_1 - \hat{p}_2}{\sqrt{\hat{p}(1-\hat{p})\left(\frac{1}{n_1}+\frac{1}{n_2}\right)}}$$
+            </div>
+
+            <div class="f">
+                <span class="lab">Lift (Yüzde İyileşme)</span>
+                $$\text{Lift} = \frac{\hat{p}_{test} - \hat{p}_{kontrol}}{\hat{p}_{kontrol}} \times 100\%$$
+            </div>
+
+            <h3>Örneklem Büyüklüğü (Oran Testi)</h3>
+            <div class="f">
+                <span class="lab">Yaklaşık Formül</span>
+                $$n \approx \frac{(z_{\alpha/2} + z_\beta)^2 \cdot [p_1(1-p_1) + p_2(1-p_2)]}{(p_1 - p_2)^2}$$
+            </div>
+
+            <h3>A/B Testi Tuzakları</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tuzak</th>
+                        <th>Çözüm</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Peeking</strong> (erken bakma)</td>
+                        <td>Önceden $n$ belirle, bekle</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Multiple testing</strong></td>
+                        <td>Bonferroni: $\alpha_{yeni} = \alpha / k$</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Simpson paradoksu</strong></td>
+                        <td>Alt segment analizi yap</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Novelty effect</strong></td>
+                        <td>Yeterli süre bekle (2+ hafta)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Selection bias</strong></td>
+                        <td>Doğru rastgele atama (randomization)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- 17. BAYESIAN -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="sec" id="s17">
+            <div class="sec-head">
+                <h2><span class="ic">🧠</span>17. Bayesian Temeller</h2>
+            </div>
+
+            <div class="f">
+                <span class="lab">Bayes Teoremi</span>
+                $$P(A|B) = \frac{P(B|A) \cdot P(A)}{P(B)}$$
+            </div>
+
+            <div class="f">
+                <span class="lab">Genel Form</span>
+                $$\underbrace{P(\theta|X)}_{\text{Posterior}} = \frac{\overbrace{P(X|\theta)}^{\text{Likelihood}} \cdot
+                \overbrace{P(\theta)}^{\text{Prior}}}{\underbrace{P(X)}_{\text{Evidence}}}$$
+            </div>
+
+            <h3>Örnek: Tıbbi Test Paradoksu</h3>
+            <p>Test doğruluğu %99, hastalık prevalansı %1 → Test pozitif çıkarsa gerçekten hasta olma olasılığı:</p>
+            <div class="f">
+                $$P(H|+) = \frac{0.99 \times 0.01}{0.99 \times 0.01 + 0.01 \times 0.99} = 0.50 = \textbf{%50}$$
+            </div>
+            <div class="warn">⚠️ %99 doğruluklu bir test bile <strong>nadir hastalıklarda</strong> yanıltıcı sonuç
+                verebilir!</div>
+
+            <h3>Frequentist vs Bayesian</h3>
+            <div class="vs">
+                <div class="vs-c">
+                    <h4>Frequentist</h4>
+                    <ul>
+                        <li>Olasılık = uzun vadeli frekans</li>
+                        <li>Parametre sabit (bilinmeyen)</li>
+                        <li>Sonuç: p-value, güven aralığı</li>
+                        <li>Prior bilgi kullanmaz</li>
+                    </ul>
+                </div>
+                <div class="vs-c">
+                    <h4>Bayesian</h4>
+                    <ul>
+                        <li>Olasılık = inanç derecesi</li>
+                        <li>Parametre rastgele değişken</li>
+                        <li>Sonuç: posterior, credible interval</li>
+                        <li>Prior bilgiyi dahil eder</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- 18. KARAR AĞACI -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <div class="sec" id="s18">
+            <div class="sec-head">
+                <h2><span class="ic">🗺️</span>18. Hangi Testi Seçmeli? — Karar Ağacı</h2>
+            </div>
+
+            <div class="tree">VERİ TİPİN NE?
+                │
+                ├── Sayısal (Sürekli)
+                │ ├── 1 Grup → Tek örneklem t-testi
+                │ ├── 2 Grup
+                │ │ ├── Bağımsız → Normal? → Evet: Bağımsız t | Hayır: Mann-Whitney U
+                │ │ └── Bağımlı → Normal? → Evet: Paired t | Hayır: Wilcoxon
+                │ └── 3+ Grup
+                │ ├── Bağımsız → Normal? → Evet: ANOVA + Tukey | Hayır: Kruskal-Wallis
+                │ └── Bağımlı → Tekrarlı Ölçümler ANOVA / Friedman
+                │
+                ├── Kategorik (Sayım)
+                │ ├── Tek değişken → Ki-Kare Uyum İyiliği
+                │ └── İki değişken → Ki-Kare Bağımsızlık
+                │
+                └── İlişki
+                ├── Doğrusal? → Normal? → Pearson $r$ | Spearman $\rho$
+                └── Tahmin? → Regresyon (Basit / Çoklu)</div>
+
+            <h3>Hızlı Kontrol Listesi</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Adım</th>
+                        <th>Yöntem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Veri tipini belirle</td>
+                        <td>Sürekli / Kategorik / Ordinal</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Dağılımı incele</td>
+                        <td>Histogram, QQ-Plot</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Normallik testi</td>
+                        <td>Shapiro-Wilk</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Varyans homojenliği</td>
+                        <td>Levene testi</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Uygun testi uygula</td>
+                        <td>Karar ağacı</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Etki büyüklüğü hesapla</td>
+                        <td>Cohen's $d$, $\eta^2$</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>Sonucu raporla</td>
+                        <td>$p$ + etki + güven aralığı</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warn">⚠️ <strong>Altın Kural:</strong> p-value TEK BAŞINA yeterli değildir. Her zaman
+                <strong>etki büyüklüğü</strong> ve <strong>güven aralığı</strong> ile birlikte raporlayın!
+            </div>
+        </div>
+
+    </div><!-- /wrap -->
+</body>
+
+</html>
