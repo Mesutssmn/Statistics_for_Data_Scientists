@@ -21,10 +21,10 @@
     </a>
     </a>
     <br><br>
-    <a href="https://mesutssmn.github.io/Statistics_for_Data_Scientists/index_en.html">
+    <a href="https://mesutssmn.github.io/Statistics_for_Data_Scientists/Statistical Evaluation Metrics.html">
       <img src="https://img.shields.io/badge/📊_ML_Metrics-EN-blue?style=for-the-badge" alt="ML Metrics EN">
     </a>
-    <a href="https://mesutssmn.github.io/Statistics_for_Data_Scientists/index.html">
+    <a href="https://mesutssmn.github.io/Statistics_for_Data_Scientists/İstatistiksel Değerlendirme Metrikleri.html">
       <img src="https://img.shields.io/badge/📊_ML_Metrikleri-TR-red?style=for-the-badge" alt="ML Metrics TR">
     </a>
     <a href="https://www.kaggle.com/code/mesutssmn/statistical-evaluation-metrics">
