@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="A comprehensive guide to Machine Learning evaluation metrics: Precision, Recall, F1 Score, Accuracy, Confusion Matrix, ROC-AUC and more.">
+    <title>Statistical Evaluation Metrics | ML Metrics Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+    <style>
+        :root {
+            --bg-primary: #0f0f1a;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #16213e;
+            --bg-code: #0d1117;
+            --accent-1: #e94560;
+            --accent-2: #0f3460;
+            --accent-3: #533483;
+            --accent-4: #00d2ff;
+            --accent-5: #7928ca;
+            --text-primary: #e8e8f0;
+            --text-secondary: #a0a0c0;
+            --text-muted: #6a6a8e;
+            --border: rgba(255, 255, 255, 0.06);
+            --radius: 16px;
+            --font: 'Inter', system-ui, sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.8;
+            font-size: 16px;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-3);
+            border-radius: 4px;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(15, 15, 26, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-5));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: color .3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-4);
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 6rem 2rem 4rem;
+            background: radial-gradient(ellipse at 50% 0%, rgba(121, 40, 202, 0.15) 0%, transparent 60%), radial-gradient(ellipse at 80% 50%, rgba(233, 69, 96, 0.08) 0%, transparent 50%), var(--bg-primary);
+            position: relative;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background: linear-gradient(to top, var(--bg-primary), transparent);
+        }
+
+        .hero-content {
+            max-width: 800px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 50px;
+            background: rgba(233, 69, 96, 0.1);
+            border: 1px solid rgba(233, 69, 96, 0.3);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-1);
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff 0%, #a0a0c0 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-stat {
+            text-align: center;
+        }
+
+        .hero-stat .val {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-4);
+        }
+
+        .hero-stat .label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        section {
+            padding: 5rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3.5rem;
+        }
+
+        .section-tag {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .section-header h2 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff, #c0c0e0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 1.05rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            transition: transform .3s, box-shadow .3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-1), var(--accent-5), var(--accent-4));
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .formula-box {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin: 1.5rem 0;
+            text-align: center;
+            font-size: 1.2rem;
+            overflow-x: auto;
+        }
+
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .matrix-table th,
+        .matrix-table td {
+            padding: 14px 18px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .matrix-table th {
+            background: var(--accent-2);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .matrix-table .tp {
+            background: rgba(0, 210, 255, 0.1);
+            color: var(--accent-4);
+            font-weight: 700;
+        }
+
+        .matrix-table .tn {
+            background: rgba(121, 40, 202, 0.1);
+            color: #b794f6;
+            font-weight: 700;
+        }
+
+        .matrix-table .fp {
+            background: rgba(233, 69, 96, 0.1);
+            color: var(--accent-1);
+            font-weight: 700;
+        }
+
+        .matrix-table .fn {
+            background: rgba(255, 165, 0, 0.1);
+            color: #ffa500;
+            font-weight: 700;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .metric-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: border-color .3s;
+        }
+
+        .metric-item:hover {
+            border-color: var(--accent-5);
+        }
+
+        .metric-item .icon {
+            font-size: 2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .metric-item h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-item p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .example {
+            background: rgba(0, 210, 255, 0.03);
+            border-left: 4px solid var(--accent-4);
+            border-radius: 0 12px 12px 0;
+            padding: 1.5rem 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .example h4 {
+            color: var(--accent-4);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.8rem;
+        }
+
+        .tip {
+            background: rgba(121, 40, 202, 0.06);
+            border-left: 4px solid var(--accent-5);
+            border-radius: 0 12px 12px 0;
+            padding: 1.5rem 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .tip h4 {
+            color: #b794f6;
+            margin-bottom: 0.5rem;
+        }
+
+        .warning {
+            background: rgba(233, 69, 96, 0.06);
+            border-left: 4px solid var(--accent-1);
+            border-radius: 0 12px 12px 0;
+            padding: 1.5rem 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .warning h4 {
+            color: var(--accent-1);
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            font-family: var(--mono);
+            background: var(--bg-code);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            color: var(--accent-4);
+        }
+
+        pre {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-size: 0.85rem;
+            line-height: 1.7;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--text-primary);
+        }
+
+        .kw {
+            color: #ff79c6;
+        }
+
+        .fn {
+            color: #50fa7b;
+        }
+
+        .str {
+            color: #f1fa8c;
+        }
+
+        .cm {
+            color: #6272a4;
+        }
+
+        .num {
+            color: #bd93f9;
+        }
+
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .compare-table th,
+        .compare-table td {
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .compare-table th {
+            background: var(--accent-2);
+            font-weight: 600;
+        }
+
+        .compare-table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .toc {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .toc h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .toc ol {
+            padding-left: 1.5rem;
+        }
+
+        .toc li {
+            margin-bottom: 0.5rem;
+        }
+
+        .toc a {
+            color: var(--accent-4);
+            text-decoration: none;
+            transition: color .3s;
+        }
+
+        .toc a:hover {
+            color: #fff;
+        }
+
+        footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--accent-4);
+            text-decoration: none;
+        }
+
+        @media(max-width:768px) {
+            nav {
+                padding: 0 1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .hero-stats {
+                gap: 1.5rem;
+            }
+
+            .formula-box {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate {
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="nav-logo">📊 ML Metrics</div>
+        <ul class="nav-links">
+            <li><a href="#confusion-matrix">Confusion Matrix</a></li>
+            <li><a href="#accuracy">Accuracy</a></li>
+            <li><a href="#precision">Precision</a></li>
+            <li><a href="#recall">Recall</a></li>
+            <li><a href="#f1-score">F1 Score</a></li>
+            <li><a href="#roc-auc">ROC-AUC</a></li>
+            <li><a href="#regression">Regression</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <span class="hero-badge">📘 Comprehensive Guide</span>
+            <h1>Statistical Evaluation Metrics</h1>
+            <p>An in-depth walkthrough of the essential metrics used to evaluate machine learning model performance —
+                with mathematical formulas and Python examples.</p>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="val">10+</div>
+                    <div class="label">Metrics</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="val">20+</div>
+                    <div class="label">Formulas</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="val">∞</div>
+                    <div class="label">Applications</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section style="padding-top:2rem;">
+        <div class="container">
+            <div class="toc">
+                <h3>📑 Table of Contents</h3>
+                <ol>
+                    <li><a href="#confusion-matrix">Confusion Matrix</a></li>
+                    <li><a href="#accuracy">Accuracy</a></li>
+                    <li><a href="#precision">Precision</a></li>
+                    <li><a href="#recall">Recall (Sensitivity)</a></li>
+                    <li><a href="#f1-score">F1 Score</a></li>
+                    <li><a href="#specificity">Specificity</a></li>
+                    <li><a href="#roc-auc">ROC Curve &amp; AUC</a></li>
+                    <li><a href="#log-loss">Log Loss</a></li>
+                    <li><a href="#regression">Regression Metrics (MAE, MSE, RMSE, R²)</a></li>
+                    <li><a href="#choosing">Choosing the Right Metric</a></li>
+                    <li><a href="#python">Python Implementation</a></li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 1. CONFUSION MATRIX ═══════════ -->
+    <section id="confusion-matrix">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"
+                    style="background:rgba(233,69,96,0.1);color:var(--accent-1);">Foundation</span>
+                <h2>Confusion Matrix</h2>
+                <p>The cornerstone of all classification metrics — a table that summarizes a model's correct and
+                    incorrect predictions.</p>
+            </div>
+            <div class="card">
+                <h3>📐 What Is a Confusion Matrix?</h3>
+                <p>A Confusion Matrix is a table used to visualize the performance of a classification model. For binary
+                    classification it is a <strong>2×2</strong> matrix with four key components:</p>
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th colspan="2">Predicted</th>
+                        </tr>
+                        <tr>
+                            <th>Actual</th>
+                            <th>Positive (+)</th>
+                            <th>Negative (−)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Positive (+)</strong></td>
+                            <td class="tp">TP<br><small>True Positive</small></td>
+                            <td class="fn">FN<br><small>False Negative</small></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Negative (−)</strong></td>
+                            <td class="fp">FP<br><small>False Positive</small></td>
+                            <td class="tn">TN<br><small>True Negative</small></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <div class="icon">✅</div>
+                        <h4>True Positive (TP)</h4>
+                        <p>Actually positive and correctly predicted as positive. <em>E.g., a sick patient correctly
+                                diagnosed as sick.</em></p>
+                    </div>
+                    <div class="metric-item">
+                        <div class="icon">❌</div>
+                        <h4>False Positive (FP)</h4>
+                        <p>Actually negative but incorrectly predicted as positive. Also known as a <em>Type I
+                                Error</em>. <em>E.g., a healthy person flagged as sick.</em></p>
+                    </div>
+                    <div class="metric-item">
+                        <div class="icon">⚠️</div>
+                        <h4>False Negative (FN)</h4>
+                        <p>Actually positive but incorrectly predicted as negative. Also known as a <em>Type II
+                                Error</em>. <em>E.g., a sick patient missed by the test.</em></p>
+                    </div>
+                    <div class="metric-item">
+                        <div class="icon">🟢</div>
+                        <h4>True Negative (TN)</h4>
+                        <p>Actually negative and correctly predicted as negative. <em>E.g., a healthy person confirmed
+                                as healthy.</em></p>
+                    </div>
+                </div>
+                <div class="example">
+                    <h4>💡 Real-World Example</h4>
+                    <p>Consider an email spam filter classifying 1,000 emails:<br>
+                        <strong>TP = 80</strong> (spam correctly caught) · <strong>FP = 10</strong> (legitimate emails
+                        marked as spam)<br>
+                        <strong>FN = 20</strong> (spam emails missed) · <strong>TN = 890</strong> (legitimate emails
+                        correctly passed)
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 2. ACCURACY ═══════════ -->
+    <section id="accuracy" style="background:var(--bg-secondary);">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" style="background:rgba(0,210,255,0.1);color:var(--accent-4);">Most Basic
+                    Metric</span>
+                <h2>Accuracy</h2>
+                <p>The most intuitive metric — but one that can be misleading when classes are imbalanced.</p>
+            </div>
+            <div class="card">
+                <h3>📏 Definition &amp; Formula</h3>
+                <p>Accuracy is the ratio of correct predictions (both positive and negative) over the total number of
+                    predictions.</p>
+                <div class="formula-box">$$ \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN} $$</div>
+                <div class="example">
+                    <h4>💡 Calculation Example</h4>
+                    <p>Spam filter: $\text{Accuracy} = \frac{80 + 890}{80 + 890 + 10 + 20} = \frac{970}{1000} =
+                        \mathbf{0.97}$ → <strong>97%</strong></p>
+                </div>
+                <div class="warning">
+                    <h4>⚠️ The Accuracy Paradox — Imbalanced Datasets</h4>
+                    <p>Accuracy can be <strong>misleading</strong> with class imbalance. For example, if only 10 out of
+                        1,000 patients have cancer, a model that <em>never</em> predicts cancer still achieves
+                        <strong>99% accuracy</strong> — yet fails to detect a single case! Use <strong>Precision,
+                            Recall, and F1 Score</strong> for imbalanced data.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 3. PRECISION ═══════════ -->
+    <section id="precision">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" style="background:rgba(121,40,202,0.1);color:#b794f6;">Positive-Focused</span>
+                <h2>Precision</h2>
+                <p>Measures how trustworthy the model's positive predictions are.</p>
+            </div>
+            <div class="card">
+                <h3>🎯 Definition &amp; Formula</h3>
+                <p>Precision is the fraction of positive predictions that are actually correct. It answers: <em>"Of
+                        everything I labeled positive, how much was truly positive?"</em></p>
+                <div class="formula-box">$$ \text{Precision} = \frac{TP}{TP + FP} $$</div>
+                <div class="example">
+                    <h4>💡 Calculation Example</h4>
+                    <p>Spam filter: $\text{Precision} = \frac{80}{80 + 10} = \frac{80}{90} = \mathbf{0.889}$ →
+                        <strong>88.9%</strong><br>
+                        Out of 90 emails flagged as spam, 80 were actually spam.
+                    </p>
+                </div>
+                <div class="tip">
+                    <h4>🔑 When Does Precision Matter?</h4>
+                    <p>Focus on Precision when <strong>false positives are costly</strong>:<br>
+                        • <strong>Spam Filter:</strong> Blocking an important email is risky<br>
+                        • <strong>Search Engine:</strong> Irrelevant results degrade user experience<br>
+                        • <strong>Recommendation System:</strong> Wrong recommendations erode trust</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 4. RECALL ═══════════ -->
+    <section id="recall" style="background:var(--bg-secondary);">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"
+                    style="background:rgba(255,165,0,0.1);color:#ffa500;">Sensitivity-Focused</span>
+                <h2>Recall (Sensitivity)</h2>
+                <p>Measures how many of the actual positive cases the model successfully captures.</p>
+            </div>
+            <div class="card">
+                <h3>🔍 Definition &amp; Formula</h3>
+                <p>Recall (also called Sensitivity or True Positive Rate) is the fraction of actual positives that the
+                    model correctly identified. It answers: <em>"Of all true positives, how many did I catch?"</em></p>
+                <div class="formula-box">$$ \text{Recall} = \frac{TP}{TP + FN} $$</div>
+                <div class="example">
+                    <h4>💡 Calculation Example</h4>
+                    <p>Spam filter: $\text{Recall} = \frac{80}{80 + 20} = \frac{80}{100} = \mathbf{0.80}$ →
+                        <strong>80%</strong><br>
+                        Out of 100 actual spam emails, our model caught 80 and missed 20.
+                    </p>
+                </div>
+                <div class="tip">
+                    <h4>🔑 When Does Recall Matter?</h4>
+                    <p>Focus on Recall when <strong>false negatives are costly</strong>:<br>
+                        • <strong>Cancer Screening:</strong> Missing a patient can be life-threatening<br>
+                        • <strong>Fraud Detection:</strong> Missed fraud leads to major financial loss<br>
+                        • <strong>Security Systems:</strong> Undetected threats pose serious risks</p>
+                </div>
+                <div class="warning">
+                    <h4>⚖️ The Precision–Recall Trade-off</h4>
+                    <p>Precision and Recall typically move in opposite directions. Lowering the decision threshold
+                        captures more positives (Recall ↑) but also increases false positives (Precision ↓). The
+                        <strong>F1 Score</strong> balances this trade-off.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 5. F1 SCORE ═══════════ -->
+    <section id="f1-score">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" style="background:rgba(0,210,255,0.1);color:var(--accent-4);">Balanced
+                    Metric</span>
+                <h2>F1 Score</h2>
+                <p>A single number that balances Precision and Recall using the harmonic mean.</p>
+            </div>
+            <div class="card">
+                <h3>⚖️ Definition &amp; Formula</h3>
+                <p>The F1 Score is the <strong>harmonic mean</strong> of Precision and Recall. The harmonic mean is used
+                    instead of the arithmetic mean because it penalizes extreme differences between the two values more
+                    heavily.</p>
+                <div class="formula-box">$$ F_1 = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision}
+                    + \text{Recall}} = \frac{2 \cdot TP}{2 \cdot TP + FP + FN} $$</div>
+                <div class="example">
+                    <h4>💡 Calculation Example</h4>
+                    <p>Spam filter: $F_1 = 2 \times \frac{0.889 \times 0.80}{0.889 + 0.80} = 2 \times
+                        \frac{0.711}{1.689} = \mathbf{0.842}$ → <strong>84.2%</strong></p>
+                </div>
+                <h3 style="margin-top:2rem;">📊 F-Beta Score — Weighted Variant</h3>
+                <p>When you want to weight Precision or Recall differently, use the <strong>F-Beta Score</strong>:</p>
+                <div class="formula-box">$$ F_\beta = (1 + \beta^2) \times \frac{\text{Precision} \times
+                    \text{Recall}}{(\beta^2 \times \text{Precision}) + \text{Recall}} $$</div>
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>Score</th>
+                            <th>β Value</th>
+                            <th>Weight</th>
+                            <th>Use Case</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>F0.5</strong></td>
+                            <td>0.5</td>
+                            <td>Favors Precision</td>
+                            <td>Spam filters, search engines</td>
+                        </tr>
+                        <tr>
+                            <td><strong>F1</strong></td>
+                            <td>1.0</td>
+                            <td>Equal weight</td>
+                            <td>General classification problems</td>
+                        </tr>
+                        <tr>
+                            <td><strong>F2</strong></td>
+                            <td>2.0</td>
+                            <td>Favors Recall</td>
+                            <td>Medical diagnosis, security systems</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 6. SPECIFICITY ═══════════ -->
+    <section id="specificity" style="background:var(--bg-secondary);">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" style="background:rgba(121,40,202,0.1);color:#b794f6;">Negative-Focused</span>
+                <h2>Specificity</h2>
+                <p>Measures how well the model identifies true negatives.</p>
+            </div>
+            <div class="card">
+                <h3>🛡️ Definition &amp; Formula</h3>
+                <p>Specificity (True Negative Rate) is the proportion of actual negatives correctly identified by the
+                    model. It is the counterpart of Recall for the negative class.</p>
+                <div class="formula-box">$$ \text{Specificity} = \frac{TN}{TN + FP} $$</div>
+                <div class="example">
+                    <h4>💡 Calculation Example</h4>
+                    <p>Spam filter: $\text{Specificity} = \frac{890}{890 + 10} = \frac{890}{900} = \mathbf{0.989}$ →
+                        <strong>98.9%</strong><br>
+                        98.9% of legitimate emails were correctly identified.</p>
+                </div>
+                <div class="tip">
+                    <h4>📌 Sensitivity vs. Specificity</h4>
+                    <p><strong>Sensitivity (Recall):</strong> How well do we detect the sick?<br>
+                        <strong>Specificity:</strong> How well do we identify the healthy?<br>
+                        Together they form the basis of the ROC curve.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 7. ROC-AUC ═══════════ -->
+    <section id="roc-auc">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" style="background:rgba(233,69,96,0.1);color:var(--accent-1);">Model
+                    Comparison</span>
+                <h2>ROC Curve &amp; AUC</h2>
+                <p>A powerful visualization and comparison tool that shows model performance across all threshold
+                    values.</p>
+            </div>
+            <div class="card">
+                <h3>📈 What Is the ROC Curve?</h3>
+                <p>The <strong>ROC (Receiver Operating Characteristic)</strong> curve plots the <strong>True Positive
+                        Rate (Recall)</strong> against the <strong>False Positive Rate (1 − Specificity)</strong> at
+                    various classification thresholds.</p>
+                <div class="formula-box">$$ \text{TPR} = \frac{TP}{TP + FN} \quad\quad \text{FPR} = \frac{FP}{FP + TN}
+                    $$</div>
+                <h3 style="margin-top:2rem;">🏆 AUC (Area Under the Curve)</h3>
+                <p><strong>AUC</strong> is the area under the ROC curve. It ranges from 0 to 1 and measures the model's
+                    overall ability to distinguish between classes.</p>
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>AUC Value</th>
+                            <th>Rating</th>
+                            <th>Interpretation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1.0</strong></td>
+                            <td>Perfect</td>
+                            <td>Model perfectly separates all classes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>0.9 – 1.0</strong></td>
+                            <td>Excellent</td>
+                            <td>High discriminative power</td>
+                        </tr>
+                        <tr>
+                            <td><strong>0.7 – 0.9</strong></td>
+                            <td>Good</td>
+                            <td>Acceptable performance</td>
+                        </tr>
+                        <tr>
+                            <td><strong>0.5 – 0.7</strong></td>
+                            <td>Poor</td>
+                            <td>Slightly better than random</td>
+                        </tr>
+                        <tr>
+                            <td><strong>0.5</strong></td>
+                            <td>Random</td>
+                            <td>Equivalent to a coin flip</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="tip">
+                    <h4>🔑 Why AUC?</h4>
+                    <p>AUC is threshold-independent and ideal for comparing models. It is more reliable than Accuracy
+                        for <strong>imbalanced datasets</strong>.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 8. LOG LOSS ═══════════ -->
+    <section id="log-loss" style="background:var(--bg-secondary);">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" style="background:rgba(255,165,0,0.1);color:#ffa500;">Probability-Based</span>
+                <h2>Log Loss (Logarithmic Loss)</h2>
+                <p>Evaluates the quality of predicted probabilities — not just right or wrong, but how confident the
+                    model is.</p>
+            </div>
+            <div class="card">
+                <h3>📉 Definition &amp; Formula</h3>
+                <p>Log Loss (Binary Cross-Entropy) measures how well the model's <strong>predicted
+                        probabilities</strong> match the true labels. Lower Log Loss = better model.</p>
+                <div class="formula-box">$$ \text{Log Loss} = -\frac{1}{N}\sum_{i=1}^{N}\left[y_i \cdot \log(\hat{y}_i)
+                    + (1-y_i) \cdot \log(1-\hat{y}_i)\right] $$</div>
+                <p>Where $y_i$ is the actual label (0 or 1), $\hat{y}_i$ is the predicted probability, and $N$ is the
+                    total number of samples.</p>
+                <div class="tip">
+                    <h4>🔑 When to Use Log Loss?</h4>
+                    <p>• When the model's <strong>confidence level</strong> matters, not just the class label<br>
+                        • When performing probability calibration<br>
+                        • Frequently used as a scoring metric in <strong>Kaggle competitions</strong></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 9. REGRESSION ═══════════ -->
+    <section id="regression">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag"
+                    style="background:rgba(0,210,255,0.1);color:var(--accent-4);">Regression</span>
+                <h2>Regression Metrics</h2>
+                <p>Error and goodness-of-fit measures for models that predict continuous values.</p>
+            </div>
+            <div class="card">
+                <h3>📐 MAE — Mean Absolute Error</h3>
+                <p>The <strong>average of absolute differences</strong> between predicted and actual values. Robust to
+                    outliers.</p>
+                <div class="formula-box">$$ \text{MAE} = \frac{1}{N}\sum_{i=1}^{N}|y_i - \hat{y}_i| $$</div>
+            </div>
+            <div class="card">
+                <h3>📊 MSE — Mean Squared Error</h3>
+                <p>The <strong>average of squared differences</strong> between predicted and actual values. Penalizes
+                    larger errors more heavily.</p>
+                <div class="formula-box">$$ \text{MSE} = \frac{1}{N}\sum_{i=1}^{N}(y_i - \hat{y}_i)^2 $$</div>
+            </div>
+            <div class="card">
+                <h3>📏 RMSE — Root Mean Squared Error</h3>
+                <p>The square root of MSE, bringing the error back to the original scale. <strong>The most widely used
+                        regression metric.</strong></p>
+                <div class="formula-box">$$ \text{RMSE} = \sqrt{\frac{1}{N}\sum_{i=1}^{N}(y_i - \hat{y}_i)^2} $$</div>
+            </div>
+            <div class="card">
+                <h3>🎯 R² — Coefficient of Determination</h3>
+                <p>Indicates how much of the variance in the dependent variable is explained by the model. Closer to 1 =
+                    better fit.</p>
+                <div class="formula-box">$$ R^2 = 1 - \frac{\sum_{i=1}^{N}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{N}(y_i -
+                    \bar{y})^2} $$</div>
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>R² Value</th>
+                            <th>Interpretation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1.0</strong></td>
+                            <td>Perfect fit — model explains all variance</td>
+                        </tr>
+                        <tr>
+                            <td><strong>0.7 – 1.0</strong></td>
+                            <td>Good fit</td>
+                        </tr>
+                        <tr>
+                            <td><strong>0.4 – 0.7</strong></td>
+                            <td>Moderate fit</td>
+                        </tr>
+                        <tr>
+                            <td><strong>&lt; 0.4</strong></td>
+                            <td>Weak fit — model doesn't explain data well</td>
+                        </tr>
+                        <tr>
+                            <td><strong>&lt; 0</strong></td>
+                            <td>Model is worse than predicting the mean</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 10. CHOOSING ═══════════ -->
+    <section id="choosing" style="background:var(--bg-secondary);">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" style="background:rgba(233,69,96,0.1);color:var(--accent-1);">Decision
+                    Guide</span>
+                <h2>Choosing the Right Metric</h2>
+                <p>Selecting the right metric is as important as selecting the right model.</p>
+            </div>
+            <div class="card">
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>Scenario</th>
+                            <th>Recommended Metric</th>
+                            <th>Why?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Balanced dataset</td>
+                            <td><strong>Accuracy, F1</strong></td>
+                            <td>Accuracy is reliable when classes are balanced</td>
+                        </tr>
+                        <tr>
+                            <td>Imbalanced dataset</td>
+                            <td><strong>F1, AUC, Precision/Recall</strong></td>
+                            <td>Accuracy can be misleading</td>
+                        </tr>
+                        <tr>
+                            <td>False positives are costly</td>
+                            <td><strong>Precision</strong></td>
+                            <td>Minimize FP</td>
+                        </tr>
+                        <tr>
+                            <td>False negatives are costly</td>
+                            <td><strong>Recall</strong></td>
+                            <td>Minimize FN</td>
+                        </tr>
+                        <tr>
+                            <td>Probability estimates matter</td>
+                            <td><strong>Log Loss, AUC</strong></td>
+                            <td>Evaluates model confidence</td>
+                        </tr>
+                        <tr>
+                            <td>Model comparison</td>
+                            <td><strong>AUC</strong></td>
+                            <td>Threshold-independent comparison</td>
+                        </tr>
+                        <tr>
+                            <td>Continuous value prediction</td>
+                            <td><strong>RMSE, MAE, R²</strong></td>
+                            <td>Designed for regression problems</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 11. PYTHON ═══════════ -->
+    <section id="python">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" style="background:rgba(0,210,255,0.1);color:var(--accent-4);">Code
+                    Examples</span>
+                <h2>Python Implementation</h2>
+                <p>Computing all metrics with scikit-learn.</p>
+            </div>
+            <div class="card">
+                <h3>🐍 Classification Metrics with Scikit-learn</h3>
+                <pre><code><span class="kw">from</span> sklearn.metrics <span class="kw">import</span> (
+    accuracy_score, precision_score, recall_score,
+    f1_score, confusion_matrix, classification_report,
+    roc_auc_score, log_loss
+)
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Ground truth and predicted labels</span>
+y_true = np.array([<span class="num">1</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">1</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">0</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">0</span>])
+y_pred = np.array([<span class="num">1</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">0</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">1</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">0</span>])
+
+<span class="cm"># Compute all metrics</span>
+<span class="fn">print</span>(<span class="str">"Accuracy :"</span>, <span class="fn">accuracy_score</span>(y_true, y_pred))
+<span class="fn">print</span>(<span class="str">"Precision:"</span>, <span class="fn">precision_score</span>(y_true, y_pred))
+<span class="fn">print</span>(<span class="str">"Recall   :"</span>, <span class="fn">recall_score</span>(y_true, y_pred))
+<span class="fn">print</span>(<span class="str">"F1 Score :"</span>, <span class="fn">f1_score</span>(y_true, y_pred))
+
+<span class="cm"># Confusion Matrix</span>
+<span class="fn">print</span>(<span class="str">"\nConfusion Matrix:"</span>)
+<span class="fn">print</span>(<span class="fn">confusion_matrix</span>(y_true, y_pred))
+
+<span class="cm"># Detailed report</span>
+<span class="fn">print</span>(<span class="str">"\nClassification Report:"</span>)
+<span class="fn">print</span>(<span class="fn">classification_report</span>(y_true, y_pred))</code></pre>
+            </div>
+            <div class="card">
+                <h3>📊 Regression Metrics</h3>
+                <pre><code><span class="kw">from</span> sklearn.metrics <span class="kw">import</span> (
+    mean_absolute_error, mean_squared_error, r2_score
+)
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+y_true = np.array([<span class="num">3.0</span>, <span class="num">5.0</span>, <span class="num">2.5</span>, <span class="num">7.0</span>, <span class="num">4.5</span>])
+y_pred = np.array([<span class="num">2.8</span>, <span class="num">5.2</span>, <span class="num">2.1</span>, <span class="num">6.8</span>, <span class="num">4.9</span>])
+
+<span class="fn">print</span>(<span class="str">"MAE :"</span>, <span class="fn">mean_absolute_error</span>(y_true, y_pred))
+<span class="fn">print</span>(<span class="str">"MSE :"</span>, <span class="fn">mean_squared_error</span>(y_true, y_pred))
+<span class="fn">print</span>(<span class="str">"RMSE:"</span>, np.<span class="fn">sqrt</span>(<span class="fn">mean_squared_error</span>(y_true, y_pred)))
+<span class="fn">print</span>(<span class="str">"R²  :"</span>, <span class="fn">r2_score</span>(y_true, y_pred))</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p style="font-size:1.1rem;margin-bottom:0.5rem;">📊 <strong>Statistical Evaluation Metrics</strong></p>
+            <p>A comprehensive resource for Machine Learning &amp; Data Science.</p>
+            <p style="margin-top:1rem;">Made with ❤️ | 2025</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.card, .section-header');
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(e => {
+                    if (e.isIntersecting) { e.target.classList.add('animate'); observer.unobserve(e.target); }
+                });
+            }, { threshold: 0.1 });
+            cards.forEach(c => observer.observe(c));
+        });
+    </script>
+
+</body>
+
+</html>

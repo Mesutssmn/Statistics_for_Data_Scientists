@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Makine Öğrenmesi değerlendirme metrikleri: Precision, Recall, F1 Score, Accuracy, Confusion Matrix, ROC-AUC ve daha fazlası.">
+    <title>İstatistiksel Değerlendirme Metrikleri | ML Metrics Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+    <style>
+        :root {
+            --bg-primary: #0f0f1a;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #16213e;
+            --bg-code: #0d1117;
+            --accent-1: #e94560;
+            --accent-2: #0f3460;
+            --accent-3: #533483;
+            --accent-4: #00d2ff;
+            --accent-5: #7928ca;
+            --text-primary: #e8e8f0;
+            --text-secondary: #a0a0c0;
+            --text-muted: #6a6a8e;
+            --border: rgba(255, 255, 255, 0.06);
+            --glow: rgba(233, 69, 96, 0.15);
+            --radius: 16px;
+            --font: 'Inter', system-ui, sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.8;
+            font-size: 16px;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-3);
+            border-radius: 4px;
+        }
+
+        /* NAV */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(15, 15, 26, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-5));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: color .3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-4);
+        }
+
+        /* HERO */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 6rem 2rem 4rem;
+            background: radial-gradient(ellipse at 50% 0%, rgba(121, 40, 202, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(233, 69, 96, 0.08) 0%, transparent 50%),
+                var(--bg-primary);
+            position: relative;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background: linear-gradient(to top, var(--bg-primary), transparent);
+        }
+
+        .hero-content {
+            max-width: 800px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 50px;
+            background: rgba(233, 69, 96, 0.1);
+            border: 1px solid rgba(233, 69, 96, 0.3);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-1);
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff 0%, #a0a0c0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-stat {
+            text-align: center;
+        }
+
+        .hero-stat .num {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-4);
+        }
+
+        .hero-stat .label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* SECTIONS */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        section {
+            padding: 5rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3.5rem;
+        }
+
+        .section-tag {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .section-header h2 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff, #c0c0e0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 1.05rem;
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            transition: transform .3s, box-shadow .3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-1), var(--accent-5), var(--accent-4));
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        /* FORMULA */
+        .formula-box {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin: 1.5rem 0;
+            text-align: center;
+            font-size: 1.2rem;
+            overflow-x: auto;
+        }
+
+        /* TABLE */
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .matrix-table th,
+        .matrix-table td {
+            padding: 14px 18px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .matrix-table th {
+            background: var(--accent-2);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .matrix-table .tp {
+            background: rgba(0, 210, 255, 0.1);
+            color: var(--accent-4);
+            font-weight: 700;
+        }
+
+        .matrix-table .tn {
+            background: rgba(121, 40, 202, 0.1);
+            color: #b794f6;
+            font-weight: 700;
+        }
+
+        .matrix-table .fp {
+            background: rgba(233, 69, 96, 0.1);
+            color: var(--accent-1);
+            font-weight: 700;
+        }
+
+        .matrix-table .fn {
+            background: rgba(255, 165, 0, 0.1);
+            color: #ffa500;
+            font-weight: 700;
+        }
+
+        /* GRID */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .metric-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: border-color .3s;
+        }
+
+        .metric-item:hover {
+            border-color: var(--accent-5);
+        }
+
+        .metric-item .icon {
+            font-size: 2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .metric-item h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-item p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* EXAMPLE BOX */
+        .example {
+            background: rgba(0, 210, 255, 0.03);
+            border-left: 4px solid var(--accent-4);
+            border-radius: 0 12px 12px 0;
+            padding: 1.5rem 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .example h4 {
+            color: var(--accent-4);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.8rem;
+        }
+
+        /* TIP / WARNING */
+        .tip {
+            background: rgba(121, 40, 202, 0.06);
+            border-left: 4px solid var(--accent-5);
+            border-radius: 0 12px 12px 0;
+            padding: 1.5rem 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .tip h4 {
+            color: #b794f6;
+            margin-bottom: 0.5rem;
+        }
+
+        .warning {
+            background: rgba(233, 69, 96, 0.06);
+            border-left: 4px solid var(--accent-1);
+            border-radius: 0 12px 12px 0;
+            padding: 1.5rem 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .warning h4 {
+            color: var(--accent-1);
+            margin-bottom: 0.5rem;
+        }
+
+        /* CODE */
+        code {
+            font-family: var(--mono);
+            background: var(--bg-code);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            color: var(--accent-4);
+        }
+
+        pre {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-size: 0.85rem;
+            line-height: 1.7;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--text-primary);
+        }
+
+        .kw {
+            color: #ff79c6;
+        }
+
+        .fn {
+            color: #50fa7b;
+        }
+
+        .str {
+            color: #f1fa8c;
+        }
+
+        .cm {
+            color: #6272a4;
+        }
+
+        .num {
+            color: #bd93f9;
+        }
+
+        /* COMPARISON TABLE */
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .compare-table th,
+        .compare-table td {
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .compare-table th {
+            background: var(--accent-2);
+            font-weight: 600;
+        }
+
+        .compare-table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* TOC */
+        .toc {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .toc h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .toc ol {
+            padding-left: 1.5rem;
+        }
+
+        .toc li {
+            margin-bottom: 0.5rem;
+        }
+
+        .toc a {
+            color: var(--accent-4);
+            text-decoration: none;
+            transition: color .3s;
+        }
+
+        .toc a:hover {
+            color: #fff;
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--accent-4);
+            text-decoration: none;
+        }
+
+        /* RESPONSIVE */
+        @media(max-width:768px) {
+            nav {
+                padding: 0 1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .hero-stats {
+                gap: 1.5rem;
+            }
+
+            .formula-box {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate {
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <div class="nav-logo">📊 ML Metrics</div>
+        <ul class="nav-links">
+            <li><a href="#confusion-matrix">Confusion Matrix</a></li>
+            <li><a href="#accuracy">Accuracy</a></li>
+            <li><a href="#precision">Precision</a></li>
+            <li><a href="#recall">Recall</a></li>
+            <li><a href="#f1-score">F1 Score</a></li>
+            <li><a href="#roc-auc">ROC-AUC</a></li>
+            <li><a href="#regression">Regresyon</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <header class="hero">
+        <div class="hero-content">
+            <span class="hero-badge">📘 Kapsamlı Rehber</span>
+            <h1>İstatistiksel Değerlendirme Metrikleri</h1>
+            <p>Makine öğrenmesi modellerinin performansını ölçmek için kullanılan temel metriklerin detaylı anlatımı,
+                matematiksel formülleri ve Python örnekleri.</p>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="num">10+</div>
+                    <div class="label">Metrik</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="num">20+</div>
+                    <div class="label">Formül</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="num">∞</div>
+                    <div class="label">Uygulama</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- TOC -->
+    <section style="padding-top:2rem;">
+        <div class="container">
+            <div class="toc">
+                <h3>📑 İçindekiler</h3>
+                <ol>
+                    <li><a href="#confusion-matrix">Confusion Matrix (Karmaşıklık Matrisi)</a></li>
+                    <li><a href="#accuracy">Accuracy (Doğruluk)</a></li>
+                    <li><a href="#precision">Precision (Kesinlik)</a></li>
+                    <li><a href="#recall">Recall (Duyarlılık)</a></li>
+                    <li><a href="#f1-score">F1 Score (F1 Skoru)</a></li>
+                    <li><a href="#specificity">Specificity (Özgüllük)</a></li>
+                    <li><a href="#roc-auc">ROC Eğrisi &amp; AUC</a></li>
+                    <li><a href="#log-loss">Log Loss</a></li>
+                    <li><a href="#regression">Regresyon Metrikleri (MAE, MSE, RMSE, R²)</a></li>
+                    <li><a href="#choosing">Hangi Metriği Ne Zaman Kullanmalı?</a></li>
+                    <li><a href="#python">Python ile Uygulama</a></li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 1. CONFUSION MATRIX ═══════════ -->
+    <section id="confusion-matrix">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" style="background:rgba(233,69,96,0.1);color:var(--accent-1);">Temel Yapı
+                    Taşı</span>
+                <h2>Confusion Matrix</h2>
+                <p>Tüm sınıflandırma metriklerinin temelini oluşturan karmaşıklık matrisi, modelin doğru ve yanlış
+                    tahminlerini özetler.</p>
+            </div>
+
+            <div class="card">
+                <h3>📐 Karmaşıklık Matrisi Nedir?</h3>
+                <p>Confusion Matrix, bir sınıflandırma modelinin performansını görselleştirmek için kullanılan bir
+                    tablodur. İkili (binary) sınıflandırmada <strong>2×2</strong> boyutunda olup 4 temel bileşenden
+                    oluşur:</p>
+
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th colspan="2">Tahmin Edilen</th>
+                        </tr>
+                        <tr>
+                            <th>Gerçek Değer</th>
+                            <th>Pozitif (+)</th>
+                            <th>Negatif (−)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Pozitif (+)</strong></td>
+                            <td class="tp">TP<br><small>True Positive</small></td>
+                            <td class="fn">FN<br><small>False Negative</small></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Negatif (−)</strong></td>
+                            <td class="fp">FP<br><small>False Positive</small></td>
+                            <td class="tn">TN<br><small>True Negative</small></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="metric-grid">
+                    <div class="metric-item">
+                        <div class="icon">✅</div>
+                        <h4>True Positive (TP)</h4>
+                        <p>Gerçekte pozitif olan ve modelin doğru şekilde pozitif tahmin ettiği örnekler. <em>Örnek:
+                                Hasta olan birinin "hasta" olarak tanınması.</em></p>
+                    </div>
+                    <div class="metric-item">
+                        <div class="icon">❌</div>
+                        <h4>False Positive (FP)</h4>
+                        <p>Gerçekte negatif olan ama modelin hatalı şekilde pozitif tahmin ettiği örnekler. <em>Tip I
+                                Hata</em> olarak da bilinir. <em>Örnek: Sağlıklı birinin "hasta" olarak tanınması.</em>
+                        </p>
+                    </div>
+                    <div class="metric-item">
+                        <div class="icon">⚠️</div>
+                        <h4>False Negative (FN)</h4>
+                        <p>Gerçekte pozitif olan ama modelin hatalı şekilde negatif tahmin ettiği örnekler. <em>Tip II
+                                Hata</em> olarak da bilinir. <em>Örnek: Hasta birinin "sağlıklı" olarak tanınması.</em>
+                        </p>
+                    </div>
+                    <div class="metric-item">
+                        <div class="icon">🟢</div>
+                        <h4>True Negative (TN)</h4>
+                        <p>Gerçekte negatif olan ve modelin doğru şekilde negatif tahmin ettiği örnekler. <em>Örnek:
+                                Sağlıklı birinin "sağlıklı" olarak tanınması.</em></p>
+                    </div>
+                </div>
+
+                <div class="example">
+                    <h4>💡 Gerçek Hayat Senaryosu</h4>
+                    <p>Bir e-posta spam filtresi düşünelim. 1000 e-postayı sınıflandırdık:<br>
+                        <strong>TP = 80</strong> (spam e-postalar doğru tespit edildi) · <strong>FP = 10</strong>
+                        (normal e-postalar yanlışlıkla spam olarak işaretlendi)<br>
+                        <strong>FN = 20</strong> (spam e-postalar tespit edilemedi) · <strong>TN = 890</strong> (normal
+                        e-postalar doğru şekilde geçirildi)
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 2. ACCURACY ═══════════ -->
+    <section id="accuracy" style="background:var(--bg-secondary);">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" style="background:rgba(0,210,255,0.1);color:var(--accent-4);">En Temel
+                    Metrik</span>
+                <h2>Accuracy (Doğruluk)</h2>
+                <p>Modelin toplam doğru tahmin oranını ölçen en sezgisel ama bazen yanıltıcı olabilen metrik.</p>
+            </div>
+
+            <div class="card">
+                <h3>📏 Tanım ve Formül</h3>
+                <p>Accuracy, tüm tahminler arasında doğru tahminlerin oranıdır. Hem doğru pozitif hem de doğru negatif
+                    tahminleri hesaba katar.</p>
+                <div class="formula-box">
+                    $$ \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN} $$
+                </div>
+
+                <div class="example">
+                    <h4>💡 Hesaplama Örneği</h4>
+                    <p>Spam filtresi senaryomuzda:<br>
+                        $\text{Accuracy} = \frac{80 + 890}{80 + 890 + 10 + 20} = \frac{970}{1000} = \mathbf{0.97}$ →
+                        <strong>%97 doğruluk</strong>
+                    </p>
+                </div>
+
+                <div class="warning">
+                    <h4>⚠️ Accuracy Paradoksu — Dengesiz Veri Setleri</h4>
+                    <p>Accuracy, veri setinde sınıf dengesizliği olduğunda <strong>yanıltıcı</strong> olabilir. Örneğin,
+                        1000 hastadan sadece 10'u kanser ise, hiç kanser tahmini yapmayan bir model bile <strong>%99
+                            accuracy</strong> elde eder — ama hiçbir kanser vakasını tespit edemez! Bu yüzden dengesiz
+                        veri setlerinde <strong>Precision, Recall ve F1 Score</strong> gibi metriklere bakmak daha
+                        anlamlıdır.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 3. PRECISION ═══════════ -->
+    <section id="precision">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" style="background:rgba(121,40,202,0.1);color:#b794f6;">Pozitif Odaklı</span>
+                <h2>Precision (Kesinlik)</h2>
+                <p>Modelin "pozitif" dediği tahminlerin ne kadar güvenilir olduğunu ölçer.</p>
+            </div>
+
+            <div class="card">
+                <h3>🎯 Tanım ve Formül</h3>
+                <p>Precision, modelin pozitif olarak tahmin ettiği örnekler içinde gerçekten pozitif olanların oranıdır.
+                    "Pozitif dediğimde ne kadar haklıyım?" sorusunu yanıtlar.</p>
+                <div class="formula-box">
+                    $$ \text{Precision} = \frac{TP}{TP + FP} $$
+                </div>
+
+                <div class="example">
+                    <h4>💡 Hesaplama Örneği</h4>
+                    <p>Spam filtresi: $\text{Precision} = \frac{80}{80 + 10} = \frac{80}{90} = \mathbf{0.889}$ →
+                        <strong>%88.9</strong><br>
+                        Yani spam diye işaretlenen her 90 e-postanın 80'i gerçekten spam.
+                    </p>
+                </div>
+
+                <div class="tip">
+                    <h4>🔑 Ne Zaman Precision Önemli?</h4>
+                    <p><strong>Yanlış pozitifin maliyeti yüksek olduğunda</strong> Precision'a odaklanılır:<br>
+                        • <strong>Spam Filtresi:</strong> Önemli bir e-postayı spam olarak işaretlemek risklidir<br>
+                        • <strong>Arama Motoru:</strong> İlgisiz sonuçlar kullanıcı deneyimini bozar<br>
+                        • <strong>Öneri Sistemi:</strong> Yanlış öneriler güven kaybına yol açar</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 4. RECALL ═══════════ -->
+    <section id="recall" style="background:var(--bg-secondary);">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" style="background:rgba(255,165,0,0.1);color:#ffa500;">Hassasiyet Odaklı</span>
+                <h2>Recall (Duyarlılık / Sensitivity)</h2>
+                <p>Gerçekte pozitif olan örneklerin ne kadarının yakalanabildiğini ölçer.</p>
+            </div>
+
+            <div class="card">
+                <h3>🔍 Tanım ve Formül</h3>
+                <p>Recall (Sensitivity veya True Positive Rate olarak da bilinir), gerçekte pozitif olan örneklerden
+                    modelin doğru tespit ettiği örneklerin oranıdır. "Gerçek pozitiflerin ne kadarını yakalayabildim?"
+                    sorusunu yanıtlar.</p>
+                <div class="formula-box">
+                    $$ \text{Recall} = \frac{TP}{TP + FN} $$
+                </div>
+
+                <div class="example">
+                    <h4>💡 Hesaplama Örneği</h4>
+                    <p>Spam filtresi: $\text{Recall} = \frac{80}{80 + 20} = \frac{80}{100} = \mathbf{0.80}$ →
+                        <strong>%80</strong><br>
+                        Yani gerçek 100 spam e-postanın 80'ini tespit edebildik, 20 tanesi gözden kaçtı.
+                    </p>
+                </div>
+
+                <div class="tip">
+                    <h4>🔑 Ne Zaman Recall Önemli?</h4>
+                    <p><strong>Yanlış negatiflerin maliyeti yüksek olduğunda</strong> Recall'a odaklanılır:<br>
+                        • <strong>Kanser Taraması:</strong> Bir hastayı kaçırmak hayati tehlike oluşturur<br>
+                        • <strong>Dolandırıcılık Tespiti:</strong> Kaçırılan dolandırıcılık büyük kayıplara yol açar<br>
+                        • <strong>Güvenlik Sistemleri:</strong> Tespit edilemeyen tehditler ciddi riskler oluşturur</p>
+                </div>
+
+                <div class="warning">
+                    <h4>⚖️ Precision ve Recall Arasındaki Trade-off</h4>
+                    <p>Precision ve Recall genellikle ters yönde hareket eder: birini artırmaya çalıştığınızda diğeri
+                        azalma eğilimi gösterir. Eğer modelin eşik değerini düşürürseniz daha fazla pozitif tahmin
+                        edersiniz (Recall ↑), ama bu arada yanlış pozitifler de artar (Precision ↓). Bu dengeyi sağlamak
+                        için <strong>F1 Score</strong> kullanılır.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 5. F1 SCORE ═══════════ -->
+    <section id="f1-score">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" style="background:rgba(0,210,255,0.1);color:var(--accent-4);">Dengeli
+                    Metrik</span>
+                <h2>F1 Score</h2>
+                <p>Precision ve Recall arasındaki dengeyi tek bir sayıda özetleyen harmonik ortalama.</p>
+            </div>
+            <div class="card">
+                <h3>⚖️ Tanım ve Formül</h3>
+                <p>F1 Score, Precision ve Recall'un <strong>harmonik ortalamasıdır</strong>. Aritmetik ortalama yerine
+                    harmonik ortalama kullanılır çünkü harmonik ortalama, iki değerden biri düşük olduğunda sonucu daha
+                    çok cezalandırır.</p>
+                <div class="formula-box">
+                    $$ F_1 = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}} =
+                    \frac{2 \cdot TP}{2 \cdot TP + FP + FN} $$
+                </div>
+                <div class="example">
+                    <h4>💡 Hesaplama Örneği</h4>
+                    <p>Spam filtresi: $F_1 = 2 \times \frac{0.889 \times 0.80}{0.889 + 0.80} = 2 \times
+                        \frac{0.711}{1.689} = \mathbf{0.842}$ → <strong>%84.2</strong></p>
+                </div>
+
+                <h3 style="margin-top:2rem;">📊 F-Beta Score — Ağırlıklı Versiyon</h3>
+                <p>Bazı durumlarda Precision veya Recall'dan birine daha fazla ağırlık vermek isteriz. Bu durumda
+                    <strong>F-Beta Score</strong> kullanılır:
+                </p>
+                <div class="formula-box">
+                    $$ F_\beta = (1 + \beta^2) \times \frac{\text{Precision} \times \text{Recall}}{(\beta^2 \times
+                    \text{Precision}) + \text{Recall}} $$
+                </div>
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>Skor</th>
+                            <th>β Değeri</th>
+                            <th>Ağırlık</th>
+                            <th>Kullanım Alanı</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>F0.5</strong></td>
+                            <td>0.5</td>
+                            <td>Precision'a daha fazla ağırlık</td>
+                            <td>Spam filtreleri, arama motorları</td>
+                        </tr>
+                        <tr>
+                            <td><strong>F1</strong></td>
+                            <td>1.0</td>
+                            <td>Eşit ağırlık</td>
+                            <td>Genel sınıflandırma problemleri</td>
+                        </tr>
+                        <tr>
+                            <td><strong>F2</strong></td>
+                            <td>2.0</td>
+                            <td>Recall'a daha fazla ağırlık</td>
+                            <td>Tıbbi teşhis, güvenlik sistemleri</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 6. SPECIFICITY ═══════════ -->
+    <section id="specificity" style="background:var(--bg-secondary);">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" style="background:rgba(121,40,202,0.1);color:#b794f6;">Negatif Odaklı</span>
+                <h2>Specificity (Özgüllük)</h2>
+                <p>Gerçekte negatif olan örneklerin ne kadarının doğru tespit edildiğini ölçer.</p>
+            </div>
+            <div class="card">
+                <h3>🛡️ Tanım ve Formül</h3>
+                <p>Specificity (True Negative Rate), gerçekte negatif olan örneklerden modelin doğru tespit ettiği
+                    negatif örneklerin oranıdır. Recall'un negatif sınıf için karşılığıdır.</p>
+                <div class="formula-box">
+                    $$ \text{Specificity} = \frac{TN}{TN + FP} $$
+                </div>
+                <div class="example">
+                    <h4>💡 Hesaplama Örneği</h4>
+                    <p>Spam filtresi: $\text{Specificity} = \frac{890}{890 + 10} = \frac{890}{900} = \mathbf{0.989}$ →
+                        <strong>%98.9</strong><br>
+                        Normal e-postaların %98.9'u doğru tanındı.
+                    </p>
+                </div>
+                <div class="tip">
+                    <h4>📌 Sensitivity vs. Specificity</h4>
+                    <p><strong>Sensitivity (Recall):</strong> Hasta olanları ne kadar iyi buluyoruz?<br>
+                        <strong>Specificity:</strong> Sağlıklı olanları ne kadar iyi ayırt ediyoruz?<br>
+                        İkisi birlikte ROC eğrisinin temelini oluşturur.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 7. ROC-AUC ═══════════ -->
+    <section id="roc-auc">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" style="background:rgba(233,69,96,0.1);color:var(--accent-1);">Model
+                    Karşılaştırma</span>
+                <h2>ROC Eğrisi ve AUC</h2>
+                <p>Farklı eşik değerlerinde modelin performansını gösteren güçlü bir görselleştirme ve karşılaştırma
+                    aracı.</p>
+            </div>
+            <div class="card">
+                <h3>📈 ROC Eğrisi Nedir?</h3>
+                <p><strong>ROC (Receiver Operating Characteristic)</strong> eğrisi, farklı eşik (threshold) değerlerinde
+                    <strong>True Positive Rate (Recall)</strong> ile <strong>False Positive Rate (1 −
+                        Specificity)</strong> arasındaki ilişkiyi gösteren bir grafiktir.
+                </p>
+                <div class="formula-box">
+                    $$ \text{TPR} = \frac{TP}{TP + FN} \quad\quad \text{FPR} = \frac{FP}{FP + TN} $$
+                </div>
+
+                <h3 style="margin-top:2rem;">🏆 AUC (Area Under the Curve)</h3>
+                <p><strong>AUC</strong>, ROC eğrisinin altında kalan alandır. 0 ile 1 arasında değer alır ve modelin
+                    genel ayırt etme gücünü ölçer.</p>
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>AUC Değeri</th>
+                            <th>Yorum</th>
+                            <th>Açıklama</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1.0</strong></td>
+                            <td>Mükemmel</td>
+                            <td>Model tüm sınıfları %100 doğru ayırt eder</td>
+                        </tr>
+                        <tr>
+                            <td><strong>0.9 – 1.0</strong></td>
+                            <td>Çok İyi</td>
+                            <td>Yüksek ayırt etme gücü</td>
+                        </tr>
+                        <tr>
+                            <td><strong>0.7 – 0.9</strong></td>
+                            <td>İyi</td>
+                            <td>Kabul edilebilir performans</td>
+                        </tr>
+                        <tr>
+                            <td><strong>0.5 – 0.7</strong></td>
+                            <td>Zayıf</td>
+                            <td>Rastgele tahminden biraz iyi</td>
+                        </tr>
+                        <tr>
+                            <td><strong>0.5</strong></td>
+                            <td>Rastgele</td>
+                            <td>Yazı tura atmakla eşdeğer</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="tip">
+                    <h4>🔑 AUC'nin Avantajı</h4>
+                    <p>AUC, eşik değerinden bağımsızdır ve farklı modelleri karşılaştırmak için idealdir. Özellikle
+                        <strong>dengesiz veri setlerinde</strong> Accuracy'den daha güvenilir bir performans
+                        göstergesidir.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 8. LOG LOSS ═══════════ -->
+    <section id="log-loss" style="background:var(--bg-secondary);">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" style="background:rgba(255,165,0,0.1);color:#ffa500;">Olasılık Bazlı</span>
+                <h2>Log Loss (Logaritmik Kayıp)</h2>
+                <p>Modelin olasılık tahminlerinin kalitesini ölçer — sadece doğru/yanlış değil, ne kadar emin olduğu da
+                    önemlidir.</p>
+            </div>
+            <div class="card">
+                <h3>📉 Tanım ve Formül</h3>
+                <p>Log Loss (Binary Cross-Entropy), modelin tahmin ettiği <strong>olasılık değerlerinin</strong> gerçek
+                    etiketlerle ne kadar uyumlu olduğunu ölçer. Düşük Log Loss = daha iyi model.</p>
+                <div class="formula-box">
+                    $$ \text{Log Loss} = -\frac{1}{N}\sum_{i=1}^{N}\left[y_i \cdot \log(\hat{y}_i) + (1-y_i) \cdot
+                    \log(1-\hat{y}_i)\right] $$
+                </div>
+                <p>Burada $y_i$ gerçek etiket (0 veya 1), $\hat{y}_i$ modelin tahmin ettiği olasılık, $N$ ise toplam
+                    örnek sayısıdır.</p>
+                <div class="tip">
+                    <h4>🔑 Ne Zaman Log Loss Kullanılır?</h4>
+                    <p>• Modelin sadece sınıf tahmini değil, <strong>güven derecesi</strong> de önemliyse<br>
+                        • Olasılık kalibrasyonu yapıyorsanız<br>
+                        • Kaggle yarışmalarında sıklıkla değerlendirme metriği olarak kullanılır</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 9. REGRESSION METRICS ═══════════ -->
+    <section id="regression">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" style="background:rgba(0,210,255,0.1);color:var(--accent-4);">Regresyon</span>
+                <h2>Regresyon Metrikleri</h2>
+                <p>Sürekli değer tahmini yapan modeller için kullanılan hata ve uyum ölçütleri.</p>
+            </div>
+            <div class="card">
+                <h3>📐 MAE — Mean Absolute Error</h3>
+                <p>Tahmin ile gerçek değer arasındaki <strong>mutlak farkların ortalaması</strong>. Aykırı değerlere
+                    karşı dayanıklıdır.</p>
+                <div class="formula-box">
+                    $$ \text{MAE} = \frac{1}{N}\sum_{i=1}^{N}|y_i - \hat{y}_i| $$
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📊 MSE — Mean Squared Error</h3>
+                <p>Tahmin ile gerçek değer arasındaki <strong>kare farkların ortalaması</strong>. Büyük hataları daha
+                    çok cezalandırır.</p>
+                <div class="formula-box">
+                    $$ \text{MSE} = \frac{1}{N}\sum_{i=1}^{N}(y_i - \hat{y}_i)^2 $$
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📏 RMSE — Root Mean Squared Error</h3>
+                <p>MSE'nin karekökü alınarak orijinal birimle aynı ölçeğe getirilmiş halidir. <strong>En yaygın
+                        regresyon metriğidir.</strong></p>
+                <div class="formula-box">
+                    $$ \text{RMSE} = \sqrt{\frac{1}{N}\sum_{i=1}^{N}(y_i - \hat{y}_i)^2} $$
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🎯 R² — Determinasyon Katsayısı</h3>
+                <p>Modelin bağımlı değişkendeki varyansın ne kadarını açıkladığını gösterir. 1'e ne kadar yakınsa model
+                    o kadar iyidir.</p>
+                <div class="formula-box">
+                    $$ R^2 = 1 - \frac{\sum_{i=1}^{N}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{N}(y_i - \bar{y})^2} $$
+                </div>
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>R² Değeri</th>
+                            <th>Yorum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1.0</strong></td>
+                            <td>Mükemmel uyum — model tüm varyansı açıklıyor</td>
+                        </tr>
+                        <tr>
+                            <td><strong>0.7 – 1.0</strong></td>
+                            <td>İyi uyum</td>
+                        </tr>
+                        <tr>
+                            <td><strong>0.4 – 0.7</strong></td>
+                            <td>Orta düzey uyum</td>
+                        </tr>
+                        <tr>
+                            <td><strong>&lt; 0.4</strong></td>
+                            <td>Zayıf uyum — model veriyi iyi açıklayamıyor</td>
+                        </tr>
+                        <tr>
+                            <td><strong>&lt; 0</strong></td>
+                            <td>Model, basit ortalama tahminden bile kötü</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 10. CHOOSING ═══════════ -->
+    <section id="choosing" style="background:var(--bg-secondary);">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" style="background:rgba(233,69,96,0.1);color:var(--accent-1);">Karar
+                    Rehberi</span>
+                <h2>Hangi Metriği Ne Zaman Kullanmalı?</h2>
+                <p>Doğru metrik seçimi, doğru model seçimi kadar önemlidir.</p>
+            </div>
+            <div class="card">
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>Senaryo</th>
+                            <th>Önerilen Metrik</th>
+                            <th>Neden?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Dengeli veri seti</td>
+                            <td><strong>Accuracy, F1</strong></td>
+                            <td>Sınıflar dengeli olduğunda accuracy güvenilirdir</td>
+                        </tr>
+                        <tr>
+                            <td>Dengesiz veri seti</td>
+                            <td><strong>F1, AUC, Precision/Recall</strong></td>
+                            <td>Accuracy yanıltıcı olabilir</td>
+                        </tr>
+                        <tr>
+                            <td>Yanlış pozitif maliyetli</td>
+                            <td><strong>Precision</strong></td>
+                            <td>FP'yi minimize etmek istiyoruz</td>
+                        </tr>
+                        <tr>
+                            <td>Yanlış negatif maliyetli</td>
+                            <td><strong>Recall</strong></td>
+                            <td>FN'yi minimize etmek istiyoruz</td>
+                        </tr>
+                        <tr>
+                            <td>Olasılık tahmini önemli</td>
+                            <td><strong>Log Loss, AUC</strong></td>
+                            <td>Modelin güven derecesi değerlendirilir</td>
+                        </tr>
+                        <tr>
+                            <td>Model karşılaştırma</td>
+                            <td><strong>AUC</strong></td>
+                            <td>Eşik değerinden bağımsız karşılaştırma</td>
+                        </tr>
+                        <tr>
+                            <td>Sürekli değer tahmini</td>
+                            <td><strong>RMSE, MAE, R²</strong></td>
+                            <td>Regresyon problemleri için uygundur</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ 11. PYTHON ═══════════ -->
+    <section id="python">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" style="background:rgba(0,210,255,0.1);color:var(--accent-4);">Kod
+                    Örnekleri</span>
+                <h2>Python ile Uygulama</h2>
+                <p>scikit-learn kütüphanesi ile tüm metriklerin hesaplanması.</p>
+            </div>
+            <div class="card">
+                <h3>🐍 Scikit-learn ile Sınıflandırma Metrikleri</h3>
+                <pre><code><span class="kw">from</span> sklearn.metrics <span class="kw">import</span> (
+    accuracy_score, precision_score, recall_score,
+    f1_score, confusion_matrix, classification_report,
+    roc_auc_score, log_loss
+)
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Gerçek ve tahmin edilen etiketler</span>
+y_true = np.array([<span class="num">1</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">1</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">0</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">0</span>])
+y_pred = np.array([<span class="num">1</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">0</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">1</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">0</span>])
+
+<span class="cm"># Tüm metrikleri hesapla</span>
+<span class="fn">print</span>(<span class="str">"Accuracy :"</span>, <span class="fn">accuracy_score</span>(y_true, y_pred))
+<span class="fn">print</span>(<span class="str">"Precision:"</span>, <span class="fn">precision_score</span>(y_true, y_pred))
+<span class="fn">print</span>(<span class="str">"Recall   :"</span>, <span class="fn">recall_score</span>(y_true, y_pred))
+<span class="fn">print</span>(<span class="str">"F1 Score :"</span>, <span class="fn">f1_score</span>(y_true, y_pred))
+
+<span class="cm"># Confusion Matrix</span>
+<span class="fn">print</span>(<span class="str">"\nConfusion Matrix:"</span>)
+<span class="fn">print</span>(<span class="fn">confusion_matrix</span>(y_true, y_pred))
+
+<span class="cm"># Detaylı rapor</span>
+<span class="fn">print</span>(<span class="str">"\nClassification Report:"</span>)
+<span class="fn">print</span>(<span class="fn">classification_report</span>(y_true, y_pred))</code></pre>
+            </div>
+
+            <div class="card">
+                <h3>📊 Regresyon Metrikleri</h3>
+                <pre><code><span class="kw">from</span> sklearn.metrics <span class="kw">import</span> (
+    mean_absolute_error, mean_squared_error, r2_score
+)
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+y_true = np.array([<span class="num">3.0</span>, <span class="num">5.0</span>, <span class="num">2.5</span>, <span class="num">7.0</span>, <span class="num">4.5</span>])
+y_pred = np.array([<span class="num">2.8</span>, <span class="num">5.2</span>, <span class="num">2.1</span>, <span class="num">6.8</span>, <span class="num">4.9</span>])
+
+<span class="fn">print</span>(<span class="str">"MAE :"</span>, <span class="fn">mean_absolute_error</span>(y_true, y_pred))
+<span class="fn">print</span>(<span class="str">"MSE :"</span>, <span class="fn">mean_squared_error</span>(y_true, y_pred))
+<span class="fn">print</span>(<span class="str">"RMSE:"</span>, np.<span class="fn">sqrt</span>(<span class="fn">mean_squared_error</span>(y_true, y_pred)))
+<span class="fn">print</span>(<span class="str">"R²  :"</span>, <span class="fn">r2_score</span>(y_true, y_pred))</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <p style="font-size:1.1rem;margin-bottom:0.5rem;">📊 <strong>İstatistiksel Değerlendirme Metrikleri</strong>
+            </p>
+            <p>Makine Öğrenmesi ve Veri Bilimi için kapsamlı Türkçe kaynak.</p>
+            <p style="margin-top:1rem;">Made with ❤️ | 2025</p>
+        </div>
+    </footer>
+
+    <!-- Scroll Animations -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.card, .section-header');
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(e => {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('animate');
+                        observer.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            cards.forEach(c => observer.observe(c));
+        });
+    </script>
+
+</body>
+
+</html>
